@@ -3,40 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Finance OS — Wootdy</title>
+<title>Finance OS</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#F7F5F0;--sf:#fff;--sf2:#F0EDE6;
   --ink:#1A1714;--ink2:#5C5650;--ink3:#A09890;
-  --green:#2D5A3D;--gl:#E8F2EC;
-  --red:#C0392B;--rl:#FDECEA;
-  --amber:#B7750D;--al:#FEF6E4;
-  --blue:#1B5FA8;--bl:#EBF3FC;
-  --purple:#5B3FA8;--pl:#EEE8FC;
+  --green:#2D5A3D;--red:#C0392B;--amber:#B7750D;
+  --blue:#1B5FA8;--bl:#EBF3FC;--purple:#5B3FA8;--pl:#EEE8FC;
   --bd:rgba(26,23,20,.1);--bd2:rgba(26,23,20,.06);
   --r:12px;--mono:'IBM Plex Mono',monospace;--sans:'Sarabun',sans-serif;
 }
-body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:15px}
-
-/* ── MONTH NAV ── */
-.mnav{background:#111;border-bottom:1px solid rgba(255,255,255,.06);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:99}
-.mnav-btn{background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.7);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .15s}
-.mnav-btn:hover{background:rgba(255,255,255,.16)}
-.mnav-btn:disabled{opacity:.25;cursor:default}
-.mnav-center{display:flex;flex-direction:column;align-items:center;gap:2px}
-.mnav-month{font-size:14px;font-weight:600;color:#fff;letter-spacing:.01em}
-.mnav-dots{display:flex;gap:5px}
-.mnav-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.2);cursor:pointer;transition:background .15s}
-.mnav-dot.on{background:#7de0a4}
-
-/* ── HEADER ── */
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:15px;overflow-x:hidden}
+.panel{transition:opacity .22s ease}
+.panel.fading{opacity:0;pointer-events:none}
+.mnav{background:#0f0f0f;border-bottom:1px solid rgba(255,255,255,.07);padding:10px 18px;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:99}
+.mnav-btn{background:rgba(255,255,255,.09);border:none;color:rgba(255,255,255,.75);
+  width:34px;height:34px;border-radius:9px;cursor:pointer;font-size:17px;
+  display:flex;align-items:center;justify-content:center;transition:background .15s;user-select:none}
+.mnav-btn:hover{background:rgba(255,255,255,.18)}
+.mnav-btn:disabled{opacity:.2;cursor:default}
+.mnav-center{display:flex;flex-direction:column;align-items:center;gap:5px}
+.mnav-month{font-size:14px;font-weight:600;color:#fff}
+.mnav-dots{display:flex;gap:6px}
+.mnav-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);cursor:pointer;transition:all .2s}
+.mnav-dot.on{background:#7de0a4;width:18px;border-radius:3px}
 .hdr{background:var(--ink);color:#fff;padding:18px 18px 16px}
 .hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
 .hdr-lbl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:3px}
 .hdr-ttl{font-size:20px;font-weight:600}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px}
 .hdr-bdg{font-size:10px;padding:3px 9px;border-radius:20px;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6)}
+.hdr-empty{background:rgba(255,255,255,.05);border-radius:8px;padding:20px;text-align:center;color:rgba(255,255,255,.3);font-size:12px;line-height:1.7}
 .hero{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.1);border-radius:8px;overflow:hidden;margin-bottom:12px}
 .hc{background:rgba(255,255,255,.06);padding:11px 14px}
 .hc-l{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:4px}
@@ -48,55 +48,64 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:15p
 .sv-inf{flex:1}
 .sv-l{font-size:13px;color:rgba(255,255,255,.7)}
 .sv-s{font-size:10px;color:rgba(255,255,255,.35);margin-top:2px}
-.prog{height:3px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:8px;overflow:hidden}
-.prog-f{height:100%;border-radius:2px;background:#7de0a4;transition:width .6s ease}
-
-/* ── ASSET PANEL ── */
+.prog{height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:8px;overflow:hidden}
+.prog-f{height:100%;border-radius:2px;background:#7de0a4}
 .assets{padding:14px 18px;background:var(--ink);border-top:1px solid rgba(255,255,255,.08)}
-.asset-title{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:10px}
+.asset-hdr-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.asset-title{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.asset-updated{font-size:9px;color:rgba(255,255,255,.2)}
 .asset-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .asset-card{background:rgba(255,255,255,.06);border-radius:10px;padding:10px 12px}
 .asset-lbl{font-size:10px;color:rgba(255,255,255,.45);margin-bottom:4px}
 .asset-amt{font-family:var(--mono);font-size:14px;font-weight:500;color:#fff}
-.asset-sub{font-size:10px;margin-top:3px}
-.asset-sub.g{color:#7de0a4}.asset-sub.p{color:#c4b0ff}.asset-sub.dim{color:rgba(255,255,255,.35)}
-.asset-na{font-family:var(--mono);font-size:13px;color:rgba(255,255,255,.2);font-style:italic}
-
-/* ── EMPTY STATE ── */
-.empty-state{padding:40px 20px;text-align:center}
-.empty-icon{font-size:40px;margin-bottom:12px;opacity:.4}
-.empty-ttl{font-size:16px;font-weight:600;color:rgba(255,255,255,.5);margin-bottom:6px}
-.empty-sub{font-size:12px;color:rgba(255,255,255,.3);line-height:1.6}
-
-/* ── MAIN ── */
+.asset-thb{font-family:var(--mono);font-size:11px;color:#7de0a4;margin-top:1px}
+.asset-rate{font-size:9px;color:rgba(255,255,255,.3);margin-top:1px}
+.asset-sub{font-size:10px;margin-top:3px;color:rgba(255,255,255,.35)}
+.asset-sub.g{color:#7de0a4}
+.liq-tag{display:inline-flex;align-items:center;font-size:9px;padding:2px 6px;border-radius:4px;margin-top:5px;font-weight:500}
+.liq-high{background:rgba(45,160,80,.2);color:#7de0a4}
+.liq-medium{background:rgba(183,117,13,.2);color:#fbbf24}
+.liq-low{background:rgba(91,63,168,.2);color:#c4b0ff}
+.liq-locked{background:rgba(192,57,43,.2);color:#ff8a7a}
+.nw-box{margin-top:10px;background:rgba(255,255,255,.08);border-radius:8px;padding:12px 14px}
+.nw-row{display:flex;justify-content:space-between;align-items:flex-end}
+.nw-cell{display:flex;flex-direction:column;gap:2px}
+.nw-cell-lbl{font-size:10px;color:rgba(255,255,255,.35)}
+.nw-cell-val{font-family:var(--mono);font-size:14px}
+.nw-total{font-family:var(--mono);font-size:20px;font-weight:500;color:#7de0a4}
+.nw-delta{font-family:var(--mono);font-size:11px;margin-top:4px}
+.nw-delta.up{color:#7de0a4}.nw-delta.dn{color:#ff8a7a}
+.nw-breakdown{margin-top:8px;font-size:10px;color:rgba(255,255,255,.22);line-height:1.7}
+.debt-card{margin-top:10px}
 .main{padding:14px 16px;max-width:600px;margin:0 auto}
-.sec{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin:18px 0 10px;display:flex;align-items:center;gap:8px}
+.sec{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);
+  margin:18px 0 10px;display:flex;align-items:center;gap:8px}
 .sec::after{content:'';flex:1;height:1px;background:var(--bd)}
-
-.tab-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:3px;margin-bottom:10px;background:var(--sf2);border-radius:10px;padding:3px}
-.tb{padding:6px 2px;border:none;background:none;cursor:pointer;border-radius:7px;font-family:var(--sans);font-size:10.5px;font-weight:500;color:var(--ink3);transition:all .15s;text-align:center;line-height:1.35}
+.tab-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:3px;margin-bottom:10px;
+  background:var(--sf2);border-radius:10px;padding:3px}
+.tb{padding:6px 2px;border:none;background:none;cursor:pointer;border-radius:7px;
+  font-family:var(--sans);font-size:10.5px;font-weight:500;color:var(--ink3);transition:all .15s;text-align:center;line-height:1.35}
 .tb.on{background:var(--sf);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.08)}
-
 .bsum{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px;margin-bottom:10px}
 .br{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--bd2)}
 .br:last-child{border-bottom:none}
 .bl{font-size:12px;color:var(--ink2)}
 .bv{display:flex;gap:12px;font-family:var(--mono);font-size:12px}
 .bb{color:var(--ink3)}.ba{font-weight:500}
-.ba.ov{color:var(--red)}.ba.ok{color:var(--green)}.ba.sv{color:var(--blue)}.ba.tr{color:var(--purple)}
+.ba.ov{color:var(--red)}.ba.ok{color:var(--green)}
 .bd-v{font-size:10px}
-.bd-v.ov{color:var(--red)}.bd-v.ok{color:var(--green)}.bd-v.sv{color:var(--blue)}
-.bsum-hdr{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:7px;display:flex;justify-content:space-between}
-
+.bd-v.ov{color:var(--red)}.bd-v.ok{color:var(--green)}
+.bsum-hdr{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);
+  margin-bottom:7px;display:flex;justify-content:space-between}
 .cats{display:flex;flex-direction:column;gap:6px}
-.cc{background:var(--sf);border:1px solid var(--bd);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color .15s;animation:fu .22s ease both}
-.cc:hover{border-color:var(--ink3)}.cc.on{border-color:var(--green)}
-.cc-h{display:flex;align-items:center;gap:9px;padding:11px 13px}
+.cc{background:var(--sf);border:1px solid var(--bd);border-radius:10px;overflow:hidden;animation:fu .22s ease both}
+.cc.on{border-color:var(--green)}
+.cc-h{display:flex;align-items:center;gap:9px;padding:11px 13px;cursor:pointer}
 .cc-i{font-size:17px;width:24px;text-align:center;flex-shrink:0}
 .cc-inf{flex:1}
 .cc-n{font-size:13px;font-weight:500;margin-bottom:3px}
 .cc-bar{height:4px;background:var(--bd2);border-radius:2px;overflow:hidden}
-.cc-f{height:100%;border-radius:2px;transition:width .7s ease}
+.cc-f{height:100%;border-radius:2px}
 .cc-f.e{background:var(--red)}.cc-f.o{background:var(--green)}.cc-f.s{background:var(--blue)}.cc-f.t{background:var(--purple)}
 .cc-r{text-align:right;flex-shrink:0}
 .cc-a{font-family:var(--mono);font-size:13px;font-weight:500}
@@ -107,7 +116,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:15p
 .cc.on .cc-chv{transform:rotate(180deg)}
 .txl{display:none;padding:0 13px 11px;flex-direction:column;gap:3px}
 .cc.on .txl{display:flex}
-.tx-h{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);padding:3px 0 5px;border-bottom:1px solid var(--bd2);margin-bottom:2px;display:flex;justify-content:space-between}
+.tx-h{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);
+  padding:3px 0 5px;border-bottom:1px solid var(--bd2);margin-bottom:2px;display:flex;justify-content:space-between}
 .tx{display:flex;align-items:center;gap:7px;padding:5px 7px;background:var(--sf2);border-radius:6px}
 .tx-d{font-family:var(--mono);font-size:10px;color:var(--ink3);min-width:36px}
 .tx-n{font-size:12px;color:var(--ink2);flex:1}
@@ -118,613 +128,780 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:15p
 .tx-s.ktb{background:var(--bl);color:var(--blue)}
 .tx-s.mv{background:var(--pl);color:var(--purple)}
 .tx-note{font-size:11px;padding-top:6px;line-height:1.5}
-
-/* ── INCOME ── */
 .inc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
 .ir{display:flex;align-items:center;padding:10px 14px;gap:10px;border-bottom:1px solid var(--bd2)}
 .ir:last-child{border-bottom:none}
-.idot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
+.idot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .in{font-size:13px;flex:1}
-.ia{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--green)}
-
-/* ── CHART ── */
+.ia{font-family:var(--mono);font-size:13px;font-weight:500}
 .chart-wrap{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:16px}
 .chart-ttl{font-size:12px;font-weight:600;margin-bottom:2px}
-.chart-sub{font-size:11px;color:var(--ink3);margin-bottom:12px}
-.chart-body{display:flex;flex-direction:column;align-items:center}
-.donut-wrap{position:relative;width:240px;height:240px;margin:0 auto}
-.donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
-.dc-amt{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--ink)}
-.dc-lbl{font-size:11px;color:var(--ink3);margin-top:2px}
-.chart-leg{display:flex;flex-direction:column;gap:6px;width:100%;margin-top:16px;padding-top:14px;border-top:1px solid var(--bd2)}
-.cl-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;cursor:pointer;transition:background .1s}
-.cl-item:hover{background:var(--sf2)}
-.cl-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
-.cl-name{font-size:12px;font-weight:500;flex:1}
-.cl-amt{font-family:var(--mono);font-size:12px;color:var(--ink3)}
-.cl-pct{font-family:var(--mono);font-size:11px;color:var(--ink3);min-width:36px;text-align:right}
-
-/* ── INSIGHT ── */
+.chart-sub{font-size:11px;color:var(--ink3);margin-bottom:14px}
+.donut-wrap{position:relative;width:260px;height:260px;margin:0 auto;touch-action:none}
+.donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;width:100px;pointer-events:none}
+.dc-lbl2{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px}
+.dc-amt{font-family:var(--mono);font-size:17px;font-weight:500;color:var(--ink);line-height:1.2}
+.dc-pct{font-family:var(--mono);font-size:12px;color:var(--green);margin-top:2px}
+.dc-lbl{font-size:10px;color:var(--ink3);margin-top:3px}
+.leg-sec-ttl{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);padding:4px 8px 2px;margin-top:4px}
+.cl-item{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px}
+.cl-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.cl-dot.circle{border-radius:50%}
+.cl-name{font-size:12px;flex:1}
+.cl-amt{font-family:var(--mono);font-size:11px;color:var(--ink3)}
+.cl-pct{font-family:var(--mono);font-size:11px;font-weight:600;min-width:42px;text-align:right}
+.chart-note{font-size:10px;color:var(--ink3);margin-top:8px;padding-top:8px;border-top:1px solid var(--bd2);line-height:1.6}
 .ins{background:var(--ink);color:#fff;border-radius:var(--r);padding:14px 16px}
 .ins-l{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:8px}
 .ins-t{font-size:13px;color:rgba(255,255,255,.8);line-height:1.7}
 .ins-t strong{color:#fff}
-.hi{display:inline-block;background:rgba(255,255,255,.12);border-radius:4px;padding:0 6px;font-family:var(--mono);font-size:12px}
+.hi{display:inline-block;background:rgba(255,255,255,.12);border-radius:4px;padding:0 5px;font-family:var(--mono);font-size:12px}
 .hi.r{background:rgba(255,100,80,.2);color:#ff8a7a}.hi.g{background:rgba(80,220,130,.15);color:#7de0a4}
-
-.main-empty{padding:40px 20px;text-align:center}
-.me-icon{font-size:48px;margin-bottom:16px;opacity:.35}
+.me-box{padding:40px 20px;text-align:center}
+.me-icon{font-size:48px;margin-bottom:14px;opacity:.35}
 .me-ttl{font-size:18px;font-weight:600;color:var(--ink3);margin-bottom:8px}
 .me-sub{font-size:13px;color:var(--ink3);line-height:1.7}
-
 .spacer{height:32px}
 @keyframes fu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.fade{animation:fadeIn .25s ease}
 </style>
 </head>
 <body>
 
-<!-- MONTH NAV -->
 <div class="mnav">
-  <button class="mnav-btn" id="btn-prev" onclick="changeMonth(-1)">‹</button>
+  <button class="mnav-btn" id="btn-prev">&#8249;</button>
   <div class="mnav-center">
-    <div class="mnav-month" id="mnav-label">—</div>
+    <div class="mnav-month" id="mnav-label">-</div>
     <div class="mnav-dots" id="mnav-dots"></div>
   </div>
-  <button class="mnav-btn" id="btn-next" onclick="changeMonth(1)">›</button>
+  <button class="mnav-btn" id="btn-next">&#8250;</button>
 </div>
-
-<!-- HEADER (dynamic) -->
-<div class="hdr" id="hdr-panel"></div>
-
-<!-- ASSETS PANEL (dynamic) -->
-<div class="assets" id="assets-panel"></div>
-
-<!-- MAIN (dynamic) -->
-<div class="main" id="main-panel"></div>
+<div id="hdr-panel" class="panel hdr"></div>
+<div id="assets-panel" class="panel assets"></div>
+<div id="main-panel" class="panel main"></div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-// DATA — keyed by 'YYYY-MM'
-// ═══════════════════════════════════════════════════════════════
-const MONTHS_ORDER = ['2026-05', '2026-06'];
+// ============================================================
+// CONSTANTS & HELPERS
+// ============================================================
+var MONTH_TH = {'01':'มกราคม','02':'กุมภาพันธ์','03':'มีนาคม','04':'เมษายน',
+  '05':'พฤษภาคม','06':'มิถุนายน','07':'กรกฎาคม','08':'สิงหาคม',
+  '09':'กันยายน','10':'ตุลาคม','11':'พฤศจิกายน','12':'ธันวาคม'};
 
-const MONTHS = {
-
-  // ──────────────────────────────────────────────────────────────
-  '2026-05': {
-    label: 'พฤษภาคม 2026',
-    badge: 'เหมียวจด + KTC',
-
-    hdr: {
-      netPayment: 38175,    netPaymentSub: 'Total earn 46,068 − หัก 7,893',
-      ktbExp:     28906,    ktbExpSub:     'ออม 25,552 + ใช้ชีวิต 3,354',
-      ktcCharges: 12993,    ktcDue:        '4 มิ.ย. 2026',
-      transfers:  38500,    transfersSub:  'ฉุกเฉิน 22,000 + ลงทุน 16,500',
-      savingRate: 71.3,
-      savingDetail: 'เหมียวจด 25,552 ÷ 35,850',
-      savingNote:   'OT เดือนนี้สูง: 7,548 บาท — Total earnings 46,068 🎉',
-    },
-
-    assets: {
-      emergency: { amt: 67016,  note: 'KTB Next Saving · รวมที่ย้ายมา 22,000' },
-      daily:     { amt: 7429,   note: 'กรุงไทย บัญชีหลัก' },
-      gold:      { amt: 25751,  cost: 23000, pct: 11.96 },
-      us:        { usd: 10071,  thb: 328127, pct: 28.80, gain: 2252 },
-      pvd:       { amt: 175177, ytd: 2.90,  note: 'ณ 15/05/2569 · TISCO+UOBAM · ต้นปี 147,746' },
-      michelin:  { eur: 5743.71, shares: 189, price: 30.390, date: '26/05/2026' },
-      sso:       { amt: 40215,  note: 'ยอดชราภาพสะสม · ผู้ประกัน+นายจ้าง+รัฐ' },
-    },
-
-    debt: { loan: { principal: 192110, interest: 611, total: 192721 } },
-
-    income: [
-      {
-        label: 'ก้อนที่ 1 — Payslip (Michelin)',
-        items: [
-          { dot: '#2D5A3D', name: 'เงินเดือน Base (31 วัน)', amt: 36950 },
-          { dot: '#B7750D', name: 'OT รวม (OT1 + OT1.5 + OT3)', amt: 7548, color: '#B7750D' },
-          { dot: '#1B5FA8', name: 'Transportation + Call In Allowance', amt: 1570, color: '#1B5FA8' },
-        ],
-        deductions: [
-          { name: 'BIB Share (หุ้น Michelin)', amt: -2085 },
-          { name: 'PVD 8%',                   amt: -2956 },
-          { name: 'Social Security',           amt: -875  },
-          { name: 'Withholding Tax',           amt: -1284 },
-          { name: 'กรอ. Education Loan',       amt: -693  },
-        ],
-        net: 38175,
-      },
-      {
-        label: 'ก้อนที่ 2 — เงินก้อนพิเศษ (บริษัท)',
-        items: [{ dot: '#8B5CF6', name: 'เงินก้อนพิเศษจากบริษัท', amt: 31500, color: '#8B5CF6' }],
-      },
-      {
-        label: 'ก้อนที่ 3 — งานเสริม',
-        items: [{ dot: '#B7750D', name: 'ค่าสอนพิเศษ / ค่าจ้าง (เหมียวจด)', amt: 4350, color: '#B7750D' }],
-      },
-    ],
-    incomeTotal: 74025,
-    incomeTotalNote: '38,175 + 31,500 + 4,350 · เดือนพิเศษ มี OT + โบนัสก้อน',
-
-    expenses: {
-      daily:{
-        label:'รายจ่ายประจำวัน', budgetTotal:14500, actualTotal:14721,
-        srows:[
-          {l:'อาหาร & Grab Food',b:8000,a:6953},
-          {l:'ช้อปปิ้ง (KTC)',b:2000,a:5407},
-          {l:'เดินทาง / Bolt',b:1500,a:903},
-          {l:'บันเทิง / Steam',b:500,a:880},
-          {l:'วิ่ง / กีฬา',b:700,a:578},
-        ],
-        cats:[
-          {i:'🍔',n:'อาหาร & Grab Food',b:8000,a:6953,f:'o',
-           sub:'รวม KTB อาหาร 2,878 + KTC Grab ~4,075',
-           t:[{d:'ต่างๆ',n:'อาหาร / Grab Food หลังเลิกงาน (KTB)',a:-2878,s:'ktb'},{d:'23/04–13/05',n:'WWW.GRAB.COM รวม 20 รายการ (KTC)',a:-4075,s:'ktc'}]},
-          {i:'🛒',n:'ช้อปปิ้ง',b:2000,a:5407,f:'e',
-           sub:'เกินงบ — Shopee ผิดปกติ',
-           t:[{d:'06/05',n:'SHOPEE ⚠️ ผิดปกติ',a:-5151,s:'ktc'},{d:'22/04',n:'MINI BIG C',a:-154,s:'ktc'},{d:'26/04',n:'MINI BIG C',a:-102,s:'ktc'}]},
-          {i:'🚌',n:'เดินทาง / Bolt',b:1500,a:903,f:'o',
-           sub:'BTS+รถ (KTB) + Bolt rides (KTC)',
-           t:[{d:'ต่างๆ',n:'BTS + รถ (KTB)',a:-476,s:'ktb'},{d:'29/04–08/05',n:'BOLT รวม 5 รายการ (KTC)',a:-427,s:'ktc'}]},
-          {i:'🎮',n:'บันเทิง / Steam',b:500,a:880,f:'e',sub:null,
-           t:[{d:'26/04',n:'STEAMGAMES.COM',a:-880,s:'ktc'}]},
-          {i:'🏃',n:'วิ่ง / กีฬา',b:700,a:578,f:'o',sub:null,
-           t:[{d:'03/05',n:'OMISE*Thai.run (ค่าสมัครวิ่ง)',a:-578,s:'ktc'}]},
-        ]
-      },
-      fixed:{
-        label:'รายจ่ายคงที่', budgetTotal:2500, actualTotal:2032,
-        note:'รายการที่ยืนยันได้จาก KTC เท่านั้น · กรอ./PVD/SS รอสลิปเงินเดือน',
-        srows:[
-          {l:'ประกันชีวิต Thai Life',b:1300,a:1300},
-          {l:'Spotify',b:150,a:149},
-          {l:'Google YouTube',b:100,a:80},
-          {l:'ค่าไฟ EasyBills',b:600,a:503},
-        ],
-        cats:[
-          {i:'🛡️',n:'ประกันชีวิต Thai Life',b:1300,a:1300,f:'o',sub:null,
-           t:[{d:'24/04',n:'THAI LIFE INSURANCE',a:-640,s:'ktc'},{d:'07/05',n:'THAI LIFE INSURANCE',a:-660,s:'ktc'}]},
-          {i:'📱',n:'Subscription (Spotify + YouTube)',b:250,a:229,f:'o',sub:null,
-           t:[{d:'07/05',n:'Spotify P422F25CCB',a:-149,s:'ktc'},{d:'10/05',n:'Google YouTube Member',a:-80,s:'ktc'}]},
-          {i:'⚡',n:'ค่าไฟ (EasyBills)',b:600,a:503,f:'o',sub:null,
-           t:[{d:'09/05',n:'EASYBILLS',a:-503,s:'ktc'}]},
-        ]
-      },
-      saving:{
-        label:'ออม / ลงทุน', isSaving:true, totalFromApp:25552,
-        note:'ยอดจากเหมียวจดหมวด "ออมเงิน, ลงทุน" = กองทุนทอง + US Stock เท่านั้น',
-        cats:[
-          {i:'💾',n:'ออมเงิน / ลงทุน (เหมียวจด)',b:null,a:25552,f:'s',
-           sub:'รวม PVD + กองทุนทอง SCBGOLDHR RMF + US Stock / Dime',
-           t:[{d:'ต่างๆ',n:'รายการออม/ลงทุน (รอสลิปแยกรายละเอียด)',a:-25552,s:'ktb'}]},
-        ]
-      },
-      transfer:{
-        label:'ย้ายเงิน', isTransfer:true, total:38500,
-        cats:[
-          {i:'🏦',n:'เงินสำรองฉุกเฉิน',a:22000,f:'t',
-           note:'ย้าย 2 ครั้ง (15/05 + 24/05) · รวมใน KTB Next Saving แล้ว',
-           t:[{d:'15/05',n:'ย้ายเงิน → เงินฉุกเฉิน',a:-15000,s:'mv'},{d:'24/05',n:'ย้ายเงิน → เงินสำรองฉุกเฉิน',a:-7000,s:'mv'}]},
-          {i:'📈',n:'เตรียมลงทุน (US Stock + กองทุนทอง)',a:16500,f:'t',
-           note:'ย้าย 15/05 · ถ้าซื้อแล้วจะแสดงเป็นหมวด "ลงทุน" ใน KTB',
-           t:[{d:'15/05',n:'ย้ายเงิน → เตรียมลงทุน',a:-16500,s:'mv'}]},
-        ]
-      }
-    },
-
-    chartData:[
-      {name:'ออม/ลงทุน',amt:25552,c:'#1B5FA8',
-       subs:[{n:'กองทุนทอง SCBGOLDHR',a:12776,c:'#3A82D8'},{n:'US Stock / Dime',a:12776,c:'#5E9FDE'}]},
-      {name:'รายจ่ายประจำวัน',amt:14721,c:'#C0392B',
-       subs:[{n:'อาหาร & Grab',a:6953,c:'#C0392B'},{n:'ช้อปปิ้ง',a:5407,c:'#8E1B12'},{n:'เดินทาง/Bolt',a:903,c:'#E87B6E'},{n:'บันเทิง',a:880,c:'#F0A89D'},{n:'วิ่ง/กีฬา',a:578,c:'#F5C5BE'}]},
-      {name:'รายจ่ายคงที่',amt:6893,c:'#B7750D',
-       subs:[{n:'BIB Share',a:2085,c:'#8A5508'},{n:'PVD 8%',a:2956,c:'#B7750D'},{n:'SS+Tax+กรอ.',a:1852,c:'#D4961F'},{n:'ประกัน+Sub+ไฟ',a:2032,c:'#E8C06B'}]},
-      {name:'ย้ายเงิน',amt:38500,c:'#5B3FA8',
-       subs:[{n:'เงินสำรองฉุกเฉิน',a:22000,c:'#5B3FA8'},{n:'เตรียมลงทุน',a:16500,c:'#8B6FCE'}]},
-    ],
-
-    insight:`รายรับจริง <strong>35,850 บาท</strong> · KTB ออม/ลงทุน <span class="hi g">25,552 บาท (71%)</span> ดีมากครับ<br><br>
-จากรายจ่าย KTC 12,993 บาท มีรายการผิดปกติ Shopee <span class="hi r">5,151 บาท</span> — ถ้าเดือนอื่นช้อปปิ้งปกติ ~2,000 จะออมได้เพิ่มอีก ~3,000 บาท<br><br>
-อาหาร + Grab รวมกัน <span class="hi r">~6,953 บาท</span> ต่อเดือน ลดได้สัก 20% จะประหยัดได้ <strong>~1,400 บาท</strong><br><br>
-<strong>Net Worth อัปเดต:</strong> บันทึก SSO 40,215 ฿ แล้ว → รวม <span class="hi g">~669,211 ฿</span>`,
-  },
-
-  // ──────────────────────────────────────────────────────────────
-  '2026-06': null,
-  // ← เพิ่มข้อมูลมิถุนายน ตามโครงสร้างเดียวกันกับ '2026-05' ด้านบน
+var LIQ = {
+  high:  {cls:'liq-high',   label:'ถอนได้ทันที'},
+  medium:{cls:'liq-medium', label:'ถอนได้ 1-3 วัน'},
+  low:   {cls:'liq-low',    label:'เงื่อนไขเฉพาะ'},
+  locked:{cls:'liq-locked', label:'Locked'},
 };
 
-// ═══════════════════════════════════════════════════════════════
+function keyToLabel(key) {
+  var p = key.split('-');
+  return (MONTH_TH[p[1]] || p[1]) + ' ' + p[0];
+}
+
+function fmt(n) { return Math.round(n).toLocaleString(); }
+
+function el(id) { return document.getElementById(id); }
+
+function calcNetWorth(m) {
+  if (!m) return null;
+  var a = m.assets, r = m.rates;
+  var usThb = Math.round(a.us.usd * r.usdThb);
+  var michelinThb = Math.round(a.michelin.eur * r.eurThb);
+  var total = a.emergency.amt + a.daily.amt + a.gold.amt + usThb + a.pvd.amt + michelinThb + a.sso.amt;
+  return { total: total, netWorth: total - m.debt.loan.total, usThb: usThb, michelinThb: michelinThb };
+}
+
+function assetCard(icon, label, primary, sub, liq) {
+  return '<div class="asset-card">'
+    + '<div class="asset-lbl">' + icon + ' ' + label + '</div>'
+    + '<div class="asset-amt">' + primary + '</div>'
+    + '<div class="asset-sub">' + sub + '</div>'
+    + '<div class="liq-tag ' + LIQ[liq].cls + '">' + LIQ[liq].label + '</div>'
+    + '</div>';
+}
+
+// ============================================================
+// DATA
+// ============================================================
+var MONTHS_ORDER = ['2026-05', '2026-06'];
+
+var MONTHS = {
+
+'2026-05': {
+  label: 'พฤษภาคม 2026',
+  badge: 'เหมียวจด + KTC',
+  lastUpdated: '26/05/2569',
+  rates: { eurThb: 38.00, usdThb: 32.58 },
+  hdr: {
+    netPayment:38175,  netPaymentSub:'Total earn 46,068 - หัก 7,893',
+    ktbExp:28906,      ktbExpSub:'ออม 25,552 + ใช้ชีวิต 3,354',
+    ktcCharges:12993,  ktcDue:'4 มิ.ย. 2026',
+    transfers:38500,   transfersSub:'ฉุกเฉิน 22,000 + ลงทุน 16,500',
+    savingRate:71.3,
+    savingDetail:'เหมียวจด 25,552 / 35,850',
+    savingNote:'OT สูง: 7,548 บาท - Total earnings 46,068',
+  },
+  assets: {
+    emergency:{amt:67016, note:'KTB Next Saving', liquidity:'high'},
+    daily:    {amt:7429,  note:'กรุงไทย บัญชีหลัก', liquidity:'high'},
+    gold:     {amt:25751, cost:23000, pct:11.96, liquidity:'medium'},
+    us:       {usd:10071, pct:28.80, gain:2252, liquidity:'medium'},
+    pvd:      {amt:175177,ytd:2.90, note:'ณ 15/05/2569 TISCO+UOBAM ตน.ปี 147,746', liquidity:'low'},
+    michelin: {eur:5743.71,shares:189,price:30.390,date:'26/05/2026',liquidity:'locked'},
+    sso:      {amt:40215, note:'ยอดชราภาพสะสม', liquidity:'low'},
+  },
+  debt: { loan: { principal:192110, interest:611, total:192721 } },
+  income: [
+    { label:'ก้อนที่ 1 - Payslip (Michelin)',
+      items:[
+        {dot:'#2D5A3D',name:'เงินเดือน Base (31 วัน)',amt:36950},
+        {dot:'#B7750D',name:'OT รวม (OT1+OT1.5+OT3)',amt:7548,color:'#B7750D'},
+        {dot:'#1B5FA8',name:'Transportation + Call In Allowance',amt:1570,color:'#1B5FA8'},
+      ],
+      deductions:[
+        {name:'BIB Share',amt:-2085},{name:'PVD 8%',amt:-2956},
+        {name:'Social Security',amt:-875},{name:'Withholding Tax',amt:-1284},
+        {name:'กรอ. Education Loan',amt:-693},
+      ],
+      net:38175 },
+    { label:'ก้อนที่ 2 - เงินก้อนพิเศษ (บริษัท)',
+      items:[{dot:'#8B5CF6',name:'เงินก้อนพิเศษ',amt:31500,color:'#8B5CF6'}] },
+    { label:'ก้อนที่ 3 - งานเสริม',
+      items:[{dot:'#B7750D',name:'ค่าสอนพิเศษ (เหมียวจด)',amt:4350,color:'#B7750D'}] },
+  ],
+  expenses: {
+    daily:{label:'รายจ่ายประจำวัน',budgetTotal:14500,actualTotal:14721,
+      srows:[{l:'อาหาร & Grab Food',b:8000,a:6953},{l:'ช้อปปิ้ง (KTC)',b:2000,a:5407},
+             {l:'เดินทาง / Bolt',b:1500,a:903},{l:'บันเทิง / Steam',b:500,a:880},{l:'วิ่ง / กีฬา',b:700,a:578}],
+      cats:[
+        {i:'🍔',n:'อาหาร & Grab Food',b:8000,a:6953,f:'o',sub:'KTB 2,878 + KTC Grab 4,075',
+         t:[{d:'ต่างๆ',n:'อาหาร KTB',a:-2878,s:'ktb'},{d:'23/04-13/05',n:'GRAB.COM 20 รายการ',a:-4075,s:'ktc'}]},
+        {i:'🛒',n:'ช้อปปิ้ง',b:2000,a:5407,f:'e',sub:'Shopee ผิดปกติ',
+         t:[{d:'06/05',n:'SHOPEE (ผิดปกติ)',a:-5151,s:'ktc'},{d:'22/04',n:'MINI BIG C',a:-154,s:'ktc'},{d:'26/04',n:'MINI BIG C',a:-102,s:'ktc'}]},
+        {i:'🚌',n:'เดินทาง / Bolt',b:1500,a:903,f:'o',sub:'BTS+รถ KTB + Bolt KTC',
+         t:[{d:'ต่างๆ',n:'BTS + รถ',a:-476,s:'ktb'},{d:'29/04-08/05',n:'BOLT 5 รายการ',a:-427,s:'ktc'}]},
+        {i:'🎮',n:'บันเทิง / Steam',b:500,a:880,f:'e',sub:null,
+         t:[{d:'26/04',n:'STEAMGAMES.COM',a:-880,s:'ktc'}]},
+        {i:'🏃',n:'วิ่ง / กีฬา',b:700,a:578,f:'o',sub:null,
+         t:[{d:'03/05',n:'Thai.run (สมัครวิ่ง)',a:-578,s:'ktc'}]},
+      ]},
+    fixed:{label:'รายจ่ายคงที่',budgetTotal:2500,actualTotal:2032,
+      note:'จาก KTC - กรอ./PVD/SS หักจากสลิปแล้ว',
+      srows:[{l:'ประกัน Thai Life',b:1300,a:1300},{l:'Spotify',b:150,a:149},
+             {l:'YouTube',b:100,a:80},{l:'ค่าไฟ EasyBills',b:600,a:503}],
+      cats:[
+        {i:'🛡️',n:'ประกัน Thai Life',b:1300,a:1300,f:'o',sub:null,
+         t:[{d:'24/04',n:'THAI LIFE INS.',a:-640,s:'ktc'},{d:'07/05',n:'THAI LIFE INS.',a:-660,s:'ktc'}]},
+        {i:'📱',n:'Subscription',b:250,a:229,f:'o',sub:null,
+         t:[{d:'07/05',n:'Spotify',a:-149,s:'ktc'},{d:'10/05',n:'YouTube Member',a:-80,s:'ktc'}]},
+        {i:'⚡',n:'ค่าไฟ (EasyBills)',b:600,a:503,f:'o',sub:null,
+         t:[{d:'09/05',n:'EASYBILLS',a:-503,s:'ktc'}]},
+      ]},
+    saving:{label:'ออม / ลงทุน',isSaving:true,
+      note:'เหมียวจดหมวด ออมเงิน = กองทุนทอง + US Stock',
+      cats:[
+        {i:'💾',n:'ออมเงิน / ลงทุน (เหมียวจด)',b:null,a:25552,f:'s',
+         sub:'กองทุนทอง SCBGOLDHR + US Stock / Dime',
+         t:[{d:'ต่างๆ',n:'ออม/ลงทุน KTB',a:-25552,s:'ktb'}]},
+      ]},
+    transfer:{label:'ย้ายเงิน',isTransfer:true,total:38500,
+      cats:[
+        {i:'🏦',n:'เงินสำรองฉุกเฉิน',a:22000,f:'t',note:'ย้าย 2 ครั้ง (15/05 + 24/05)',
+         t:[{d:'15/05',n:'ย้ายเงินฉุกเฉิน',a:-15000,s:'mv'},{d:'24/05',n:'ย้ายเงินสำรอง',a:-7000,s:'mv'}]},
+        {i:'📈',n:'เตรียมลงทุน',a:16500,f:'t',note:'ย้าย 15/05 รอซื้อ',
+         t:[{d:'15/05',n:'ย้ายเงินลงทุน',a:-16500,s:'mv'}]},
+      ]},
+  },
+  chart:{
+    incomeRef:74025,
+    incomeSources:[
+      {name:'Payslip NET',amt:38175,c:'#2D5A3D'},
+      {name:'เงินก้อนพิเศษ',amt:31500,c:'#7B5EA7'},
+      {name:'ค่าสอน/จ้าง',amt:4350,c:'#C4870A'},
+    ],
+    zones:[
+      {name:'ออม/ลงทุน',amt:25552,c:'#1B5FA8',
+       subs:[{n:'กองทุนทอง',a:12776,c:'#3A82D8'},{n:'US Stock/Dime',a:12776,c:'#5E9FDE'}]},
+      {name:'รายจ่ายประจำวัน',amt:14721,c:'#C0392B',
+       subs:[{n:'อาหาร&Grab',a:6953,c:'#C0392B'},{n:'ช้อปปิ้ง',a:5407,c:'#8E1B12'},{n:'เดินทาง',a:903,c:'#E87B6E'},{n:'บันเทิง+วิ่ง',a:1458,c:'#F0A89D'}]},
+      {name:'รายจ่ายคงที่',amt:6893,c:'#B7750D',
+       subs:[{n:'PVD 8%',a:2956,c:'#8A5508'},{n:'BIB Share',a:2085,c:'#B7750D'},{n:'SS+Tax+กรอ.',a:1852,c:'#E8C06B'}]},
+      {name:'ย้ายเงิน',amt:26859,c:'#5B3FA8',
+       subs:[{n:'เงินสำรองฉุกเฉิน',a:22000,c:'#5B3FA8'},{n:'เตรียมลงทุน',a:4859,c:'#8B6FCE'}]},
+    ],
+  },
+  insight:'รายรับ KTB <strong>35,850 บาท</strong> · ออม <span class="hi g">25,552 (71.3%)</span> ดีมากครับ<br><br>Shopee KTC <span class="hi r">5,151 บาท</span> ผิดปกติ ถ้าปกติจะออมเพิ่มได้ ~3,000<br><br>Net Worth รวม SSO แล้ว <span class="hi g">~669,241 บาท</span>',
+},
+
+'2026-06': null,
+
+}; // end MONTHS
+
+// ============================================================
 // STATE
-// ═══════════════════════════════════════════════════════════════
-let currentIdx = 0;
-let activeTab  = 'daily';
+// ============================================================
+var currentIdx = 0;
+var activeTab  = 'daily';
+var _pending   = null;
+var PANELS     = ['hdr-panel', 'assets-panel', 'main-panel'];
 
-// ═══════════════════════════════════════════════════════════════
-// MONTH NAV
-// ═══════════════════════════════════════════════════════════════
+// ============================================================
+// TRANSITIONS
+// ============================================================
+function fadeIn() {
+  for (var i = 0; i < PANELS.length; i++) {
+    el(PANELS[i]).classList.remove('fading');
+  }
+}
+
 function changeMonth(dir) {
-  const next = currentIdx + dir;
+  var next = currentIdx + dir;
   if (next < 0 || next >= MONTHS_ORDER.length) return;
-  currentIdx = next;
-  activeTab = 'daily';
-  renderAll();
+  clearTimeout(_pending);
+  for (var i = 0; i < PANELS.length; i++) {
+    el(PANELS[i]).classList.add('fading');
+  }
+  var targetIdx = next;
+  _pending = setTimeout(function() {
+    currentIdx = targetIdx;
+    activeTab  = 'daily';
+    renderAll();
+    fadeIn();
+  }, 200);
 }
 
+function jumpTo(idx) {
+  if (idx === currentIdx) return;
+  clearTimeout(_pending);
+  for (var i = 0; i < PANELS.length; i++) {
+    el(PANELS[i]).classList.add('fading');
+  }
+  var targetIdx = idx;
+  _pending = setTimeout(function() {
+    currentIdx = targetIdx;
+    activeTab  = 'daily';
+    renderAll();
+    fadeIn();
+  }, 200);
+}
+
+// ============================================================
+// RENDER NAV
+// ============================================================
 function renderNav() {
-  const key = MONTHS_ORDER[currentIdx];
-  const m   = MONTHS[key];
-  document.getElementById('mnav-label').textContent = m ? m.label : MONTHS_ORDER[currentIdx].replace('-', ' / ');
+  var key = MONTHS_ORDER[currentIdx];
+  el('mnav-label').textContent = keyToLabel(key);
+  el('btn-prev').disabled = (currentIdx === 0);
+  el('btn-next').disabled = (currentIdx === MONTHS_ORDER.length - 1);
 
-  document.getElementById('btn-prev').disabled = currentIdx === 0;
-  document.getElementById('btn-next').disabled = currentIdx === MONTHS_ORDER.length - 1;
-
-  const dots = document.getElementById('mnav-dots');
-  dots.innerHTML = MONTHS_ORDER.map((k, i) =>
-    `<div class="mnav-dot${i===currentIdx?' on':''}" onclick="currentIdx=${i};activeTab='daily';renderAll()"></div>`
-  ).join('');
-}
-
-// ═══════════════════════════════════════════════════════════════
-// HEADER
-// ═══════════════════════════════════════════════════════════════
-function renderHeader(m) {
-  const el = document.getElementById('hdr-panel');
-  if (!m) { el.innerHTML = ''; return; }
-  const h = m.hdr;
-  el.innerHTML = `
-  <div class="hdr-top">
-    <div>
-      <div class="hdr-lbl">Finance OS · Wootdy</div>
-      <div class="hdr-ttl">${m.label}</div>
-    </div>
-    <span class="hdr-bdg">${m.badge}</span>
-  </div>
-  <div class="hero">
-    <div class="hc">
-      <div class="hc-l">Net Payment (Payslip)</div>
-      <div class="hc-a g">${h.netPayment.toLocaleString()}</div>
-      <div class="hc-s">${h.netPaymentSub}</div>
-    </div>
-    <div class="hc">
-      <div class="hc-l">รายจ่าย KTB (เหมียวจด)</div>
-      <div class="hc-a r">${h.ktbExp.toLocaleString()}</div>
-      <div class="hc-s">${h.ktbExpSub}</div>
-    </div>
-    <div class="hc">
-      <div class="hc-l">KTC charges เดือนนี้</div>
-      <div class="hc-a r">${h.ktcCharges.toLocaleString()}</div>
-      <div class="hc-s">ครบกำหนด ${h.ktcDue}</div>
-    </div>
-    <div class="hc">
-      <div class="hc-l">ย้ายเงิน (ไม่นับจ่าย)</div>
-      <div class="hc-a p">${h.transfers.toLocaleString()}</div>
-      <div class="hc-s">${h.transfersSub}</div>
-    </div>
-  </div>
-  <div class="sv-bar">
-    <div class="sv-r">${h.savingRate}%</div>
-    <div class="sv-inf">
-      <div class="sv-l">อัตราการออม (${h.savingDetail})</div>
-      <div class="sv-s">${h.savingNote}</div>
-    </div>
-  </div>
-  <div class="prog"><div class="prog-f" style="width:${h.savingRate}%"></div></div>`;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// ASSETS
-// ═══════════════════════════════════════════════════════════════
-function renderAssets(m) {
-  const el = document.getElementById('assets-panel');
-  if (!m) {
-    el.innerHTML = `
-    <div class="asset-title">📊 ทรัพย์สินที่ติดตามได้ (Net Worth Tracker)</div>
-    <div class="empty-state">
-      <div class="empty-icon">📂</div>
-      <div class="empty-ttl">ยังไม่มีข้อมูลเดือนนี้</div>
-      <div class="empty-sub">เพิ่มข้อมูลใน MONTHS['${MONTHS_ORDER[currentIdx]}']<br>ตามโครงสร้างเดียวกันกับพฤษภาคม 2026</div>
-    </div>`;
-    return;
+  var dotsEl = el('mnav-dots');
+  var html = '';
+  for (var i = 0; i < MONTHS_ORDER.length; i++) {
+    html += '<div class="mnav-dot' + (i === currentIdx ? ' on' : '') + '" data-idx="' + i + '"></div>';
   }
+  dotsEl.innerHTML = html;
 
-  const a = m.assets;
-  const d = m.debt;
-
-  // compute net worth
-  const totalAssets = a.emergency.amt + a.daily.amt + a.gold.amt +
-    a.us.thb + a.pvd.amt + (a.michelin.eur * 38) + a.sso.amt;
-  const totalDebt   = d.loan.total;
-  const netWorth    = totalAssets - totalDebt;
-
-  el.innerHTML = `
-  <div class="asset-title">📊 ทรัพย์สินที่ติดตามได้ (Net Worth Tracker)</div>
-  <div class="asset-grid">
-    <div class="asset-card">
-      <div class="asset-lbl">🏦 เงินสำรองฉุกเฉิน</div>
-      <div class="asset-amt">${a.emergency.amt.toLocaleString()} ฿</div>
-      <div class="asset-sub dim">${a.emergency.note}</div>
-    </div>
-    <div class="asset-card">
-      <div class="asset-lbl">💳 บัญชีใช้จ่ายประจำวัน</div>
-      <div class="asset-amt">${a.daily.amt.toLocaleString()} ฿</div>
-      <div class="asset-sub dim">${a.daily.note}</div>
-    </div>
-    <div class="asset-card">
-      <div class="asset-lbl">🥇 กองทุนทอง SCBGOLDHR RMF</div>
-      <div class="asset-amt">${a.gold.amt.toLocaleString()} ฿</div>
-      <div class="asset-sub g">ต้นทุน ${a.gold.cost.toLocaleString()} · กำไร +${(a.gold.amt-a.gold.cost).toLocaleString()} (+${a.gold.pct}%)</div>
-    </div>
-    <div class="asset-card">
-      <div class="asset-lbl">📈 พอร์ต US (Dime)</div>
-      <div class="asset-amt">$${a.us.usd.toLocaleString()}</div>
-      <div class="asset-sub g">≈ ${a.us.thb.toLocaleString()} ฿ · +${a.us.pct}% (+$${a.us.gain.toLocaleString()})</div>
-    </div>
-    <div class="asset-card">
-      <div class="asset-lbl">💼 PVD กองทุนสำรองเลี้ยงชีพ</div>
-      <div class="asset-amt">${a.pvd.amt.toLocaleString()} ฿</div>
-      <div class="asset-sub g">${a.pvd.note} · YTD +${a.pvd.ytd}%</div>
-    </div>
-    <div class="asset-card">
-      <div class="asset-lbl">🏭 หุ้น Michelin (BIB Sharinbox)</div>
-      <div class="asset-amt">€${a.michelin.eur.toLocaleString()}</div>
-      <div class="asset-sub g">${a.michelin.shares} หุ้น · €${a.michelin.price}/หุ้น (${a.michelin.date}) · Unavailable</div>
-    </div>
-    <div class="asset-card">
-      <div class="asset-lbl">🏥 กองทุนประกันสังคม (SSO)</div>
-      <div class="asset-amt">${a.sso.amt.toLocaleString()} ฿</div>
-      <div class="asset-sub g">${a.sso.note}</div>
-    </div>
-  </div>
-
-  <div style="margin-top:10px">
-    <div style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px">📋 หนี้สิน</div>
-    <div class="asset-card" style="border-color:rgba(255,100,80,.2);background:rgba(255,80,60,.06)">
-      <div class="asset-lbl">📚 เงินกู้ กรอ. (กยศ.) — บัญชี 55 5001988608</div>
-      <div class="asset-amt" style="color:#ff8a7a">${d.loan.total.toLocaleString()} ฿</div>
-      <div class="asset-sub" style="color:rgba(255,100,80,.6)">เงินต้น ${d.loan.principal.toLocaleString()} + ดอกเบี้ย ${d.loan.interest.toLocaleString()} · ผ่อน 693/เดือน · เบี้ยปรับ 0</div>
-    </div>
-  </div>
-
-  <div style="margin-top:10px;background:rgba(255,255,255,.08);border-radius:8px;padding:12px 14px">
-    <div style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:8px">Net Worth รวม (ทรัพย์สิน − หนี้สิน)</div>
-    <div style="display:flex;justify-content:space-between;align-items:flex-end">
-      <div>
-        <div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:2px">ทรัพย์สินรวม</div>
-        <div style="font-family:var(--mono);font-size:14px;color:rgba(255,255,255,.6)">+${Math.round(totalAssets).toLocaleString()} ฿</div>
-      </div>
-      <div style="font-size:18px;color:rgba(255,255,255,.3)">−</div>
-      <div>
-        <div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:2px">หนี้สินรวม</div>
-        <div style="font-family:var(--mono);font-size:14px;color:#ff8a7a">−${totalDebt.toLocaleString()} ฿</div>
-      </div>
-      <div style="font-size:18px;color:rgba(255,255,255,.3)">=</div>
-      <div style="text-align:right">
-        <div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:2px">Net Worth</div>
-        <div style="font-family:var(--mono);font-size:20px;font-weight:500;color:#7de0a4">~${Math.round(netWorth).toLocaleString()} ฿</div>
-      </div>
-    </div>
-    <div style="margin-top:10px;font-size:10px;color:rgba(255,255,255,.25);line-height:1.6">
-      เงินสด ${(a.emergency.amt+a.daily.amt).toLocaleString()} · ทอง ${a.gold.amt.toLocaleString()} · US ~${a.us.thb.toLocaleString()} · PVD ${a.pvd.amt.toLocaleString()} · Michelin ~${Math.round(a.michelin.eur*38).toLocaleString()} · SSO ${a.sso.amt.toLocaleString()}
-    </div>
-  </div>`;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// MAIN PANEL
-// ═══════════════════════════════════════════════════════════════
-function renderMain(m) {
-  const el = document.getElementById('main-panel');
-  if (!m) {
-    el.innerHTML = `
-    <div class="main-empty fade">
-      <div class="me-icon">📅</div>
-      <div class="me-ttl">ยังไม่มีข้อมูลเดือนนี้</div>
-      <div class="me-sub">เมื่อได้รับข้อมูลจาก เหมียวจด + KTC Statement<br>เพิ่มเข้า MONTHS['${MONTHS_ORDER[currentIdx]}'] แล้ว dashboard จะอัปเดตอัตโนมัติ</div>
-    </div>
-    <div class="spacer"></div>`;
-    return;
-  }
-
-  // Income HTML
-  let incHTML = `<div class="sec">รายได้เดือนนี้ (${m.label})</div>`;
-  m.income.forEach(blk => {
-    incHTML += `<div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;padding:0 2px">${blk.label}</div>`;
-    incHTML += `<div class="inc">`;
-    blk.items.forEach(it => {
-      incHTML += `<div class="ir"><div class="idot" style="background:${it.dot}"></div><div class="in">${it.name}</div><div class="ia" style="color:${it.color||'#2D5A3D'}">+${it.amt.toLocaleString()}</div></div>`;
-    });
-    incHTML += `</div>`;
-    if (blk.deductions) {
-      incHTML += `<div style="background:var(--sf);border:1px solid var(--bd);border-top:none;border-radius:0 0 var(--r) var(--r);padding:10px 14px;margin-bottom:10px">
-        <div style="display:flex;flex-direction:column;gap:3px">
-          <div style="font-size:11px;color:var(--ink3);margin-bottom:4px">หักก่อนเข้า KTB:</div>
-          <div style="display:grid;grid-template-columns:1fr auto auto;gap:4px 12px;font-size:11px;color:var(--ink3);padding-left:8px">`;
-      blk.deductions.forEach(ded => {
-        incHTML += `<span>${ded.name}</span><span></span><span style="font-family:var(--mono)">${ded.amt.toLocaleString()}</span>`;
+  // Add click handlers to dots (no inline onclick)
+  var dots = dotsEl.querySelectorAll('.mnav-dot');
+  for (var j = 0; j < dots.length; j++) {
+    (function(dot) {
+      dot.addEventListener('click', function() {
+        jumpTo(parseInt(dot.getAttribute('data-idx'), 10));
       });
-      incHTML += `</div>
-          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:var(--ink);padding-top:8px;border-top:1px solid var(--bd)">
-            <span>NET เข้า KTB (Payslip)</span>
-            <span style="font-family:var(--mono);color:var(--green)">+${blk.net.toLocaleString()} ฿</span>
-          </div></div></div>`;
-    } else {
-      incHTML += `<div style="margin-bottom:10px"></div>`;
+    })(dots[j]);
+  }
+}
+
+// ============================================================
+// RENDER HEADER
+// ============================================================
+function renderHeader(m, key) {
+  var panel = el('hdr-panel');
+  if (!m) {
+    panel.innerHTML = '<div class="hdr-top"><div>'
+      + '<div class="hdr-lbl">Finance OS · Wootdy</div>'
+      + '<div class="hdr-ttl">' + keyToLabel(key) + '</div>'
+      + '</div><span class="hdr-bdg">ยังไม่มีข้อมูล</span></div>'
+      + '<div class="hdr-empty">ยังไม่ได้รับข้อมูลเดือนนี้</div>';
+    return;
+  }
+  var h = m.hdr;
+  panel.innerHTML = '<div class="hdr-top"><div>'
+    + '<div class="hdr-lbl">Finance OS · Wootdy</div>'
+    + '<div class="hdr-ttl">' + m.label + '</div>'
+    + '<div class="hdr-sub">อัปเดต ' + m.lastUpdated + '</div>'
+    + '</div><span class="hdr-bdg">' + m.badge + '</span></div>'
+    + '<div class="hero">'
+    + '<div class="hc"><div class="hc-l">Net Payment</div><div class="hc-a g">' + fmt(h.netPayment) + '</div><div class="hc-s">' + h.netPaymentSub + '</div></div>'
+    + '<div class="hc"><div class="hc-l">รายจ่าย KTB</div><div class="hc-a r">' + fmt(h.ktbExp) + '</div><div class="hc-s">' + h.ktbExpSub + '</div></div>'
+    + '<div class="hc"><div class="hc-l">KTC charges</div><div class="hc-a r">' + fmt(h.ktcCharges) + '</div><div class="hc-s">ครบ ' + h.ktcDue + '</div></div>'
+    + '<div class="hc"><div class="hc-l">ย้ายเงิน</div><div class="hc-a p">' + fmt(h.transfers) + '</div><div class="hc-s">' + h.transfersSub + '</div></div>'
+    + '</div>'
+    + '<div class="sv-bar"><div class="sv-r">' + h.savingRate + '%</div><div class="sv-inf">'
+    + '<div class="sv-l">อัตราออม (' + h.savingDetail + ')</div>'
+    + '<div class="sv-s">' + h.savingNote + '</div></div></div>'
+    + '<div class="prog"><div class="prog-f" style="width:' + h.savingRate + '%"></div></div>';
+}
+
+// ============================================================
+// RENDER ASSETS
+// ============================================================
+function renderAssets(m, key) {
+  var panel = el('assets-panel');
+  if (!m) {
+    panel.innerHTML = '<div class="asset-hdr-row"><div class="asset-title">Net Worth Tracker</div></div>'
+      + '<div style="text-align:center;padding:24px 0;color:rgba(255,255,255,.25);font-size:12px">ยังไม่มีข้อมูล</div>';
+    return;
+  }
+  var a = m.assets, r = m.rates, d = m.debt;
+  var nw = calcNetWorth(m);
+  var usThb = nw.usThb;
+  var michelinThb = nw.michelinThb;
+
+  var prevKey = currentIdx > 0 ? MONTHS_ORDER[currentIdx - 1] : null;
+  var prevM   = prevKey ? MONTHS[prevKey] : null;
+  var prevNW  = prevM ? calcNetWorth(prevM) : null;
+  var deltaEl = '';
+  if (prevNW) {
+    var delta = nw.netWorth - prevNW.netWorth;
+    deltaEl = '<div class="nw-delta ' + (delta >= 0 ? 'up' : 'dn') + '">'
+      + (delta >= 0 ? '&#8593;' : '&#8595;') + ' ' + fmt(Math.abs(delta)) + ' บาท vs ' + keyToLabel(prevKey)
+      + '</div>';
+  }
+
+  var html = '<div class="asset-hdr-row">'
+    + '<div class="asset-title">ทรัพย์สิน (Net Worth Tracker)</div>'
+    + '<div class="asset-updated">อัปเดต ' + m.lastUpdated + '</div>'
+    + '</div><div class="asset-grid">'
+    + assetCard('🏦', 'เงินสำรองฉุกเฉิน', fmt(a.emergency.amt) + ' บาท', a.emergency.note, 'high')
+    + assetCard('💳', 'บัญชีประจำวัน', fmt(a.daily.amt) + ' บาท', a.daily.note, 'high')
+    + assetCard('🥇', 'ทอง SCBGOLDHR RMF', fmt(a.gold.amt) + ' บาท', 'ต้นทุน ' + fmt(a.gold.cost) + ' กำไร +' + fmt(a.gold.amt - a.gold.cost), 'medium')
+    + '<div class="asset-card">'
+    + '<div class="asset-lbl">📈 US Stock (Dime)</div>'
+    + '<div class="asset-amt">$' + fmt(a.us.usd) + '</div>'
+    + '<div class="asset-thb">≈ ' + fmt(usThb) + ' บาท</div>'
+    + '<div class="asset-rate">$1 = ' + r.usdThb + ' บาท · +' + a.us.pct + '%</div>'
+    + '<div class="liq-tag ' + LIQ.medium.cls + '">' + LIQ.medium.label + '</div></div>'
+    + assetCard('💼', 'PVD สยามมิชลิน', fmt(a.pvd.amt) + ' บาท', a.pvd.note + ' YTD +' + a.pvd.ytd + '%', 'low')
+    + '<div class="asset-card">'
+    + '<div class="asset-lbl">🏭 Michelin BIB Sharinbox</div>'
+    + '<div class="asset-amt">€' + a.michelin.eur.toLocaleString() + '</div>'
+    + '<div class="asset-thb">≈ ' + fmt(michelinThb) + ' บาท</div>'
+    + '<div class="asset-rate">€1 = ' + r.eurThb + ' บาท · ' + a.michelin.shares + ' หุ้น (' + a.michelin.date + ')</div>'
+    + '<div class="liq-tag ' + LIQ.locked.cls + '">' + LIQ.locked.label + '</div></div>'
+    + assetCard('🏥', 'SSO ชราภาพ', fmt(a.sso.amt) + ' บาท', a.sso.note, 'low')
+    + '</div>'
+    + '<div class="debt-card">'
+    + '<div style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px">หนี้สิน</div>'
+    + '<div class="asset-card" style="background:rgba(255,80,60,.06)">'
+    + '<div class="asset-lbl">📚 เงินกู้ กรอ. (กยศ.)</div>'
+    + '<div class="asset-amt" style="color:#ff8a7a">' + fmt(d.loan.total) + ' บาท</div>'
+    + '<div class="asset-sub" style="color:rgba(255,100,80,.5)">เงินต้น ' + fmt(d.loan.principal) + ' + ดอก ' + fmt(d.loan.interest) + '</div>'
+    + '</div></div>'
+    + '<div class="nw-box">'
+    + '<div style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:8px">Net Worth</div>'
+    + '<div class="nw-row">'
+    + '<div class="nw-cell"><div class="nw-cell-lbl">ทรัพย์สิน</div><div class="nw-cell-val" style="color:rgba(255,255,255,.6)">+' + fmt(nw.total) + '</div></div>'
+    + '<div style="font-size:18px;color:rgba(255,255,255,.3)">-</div>'
+    + '<div class="nw-cell"><div class="nw-cell-lbl">หนี้สิน</div><div class="nw-cell-val" style="color:#ff8a7a">-' + fmt(d.loan.total) + '</div></div>'
+    + '<div style="font-size:18px;color:rgba(255,255,255,.3)">=</div>'
+    + '<div class="nw-cell" style="text-align:right"><div class="nw-cell-lbl">Net Worth</div>'
+    + '<div class="nw-total">~' + fmt(nw.netWorth) + ' บาท</div>' + deltaEl + '</div>'
+    + '</div>'
+    + '<div class="nw-breakdown">เงินสด ' + fmt(a.emergency.amt + a.daily.amt) + ' · ทอง ' + fmt(a.gold.amt) + ' · US ~' + fmt(usThb) + ' · PVD ' + fmt(a.pvd.amt) + ' · Michelin ~' + fmt(michelinThb) + ' · SSO ' + fmt(a.sso.amt) + '</div>'
+    + '</div>';
+  panel.innerHTML = html;
+}
+
+// ============================================================
+// RENDER MAIN
+// ============================================================
+function renderMain(m, key) {
+  var panel = el('main-panel');
+  if (!m) {
+    panel.innerHTML = '<div class="me-box">'
+      + '<div class="me-icon">📅</div>'
+      + '<div class="me-ttl">ยังไม่มีข้อมูลเดือนนี้</div>'
+      + '<div class="me-sub">เพิ่มใน MONTHS["' + key + '"]</div>'
+      + '</div><div class="spacer"></div>';
+    return;
+  }
+
+  // Income section
+  var totalInc = 0;
+  var noteParts = [];
+  var incH = '<div class="sec">รายได้เดือนนี้</div>';
+  for (var bi = 0; bi < m.income.length; bi++) {
+    var blk = m.income[bi];
+    var blkTotal = (blk.net !== undefined) ? blk.net : blk.items.reduce(function(s, it) { return s + it.amt; }, 0);
+    totalInc += blkTotal;
+    noteParts.push(fmt(blkTotal));
+
+    incH += '<div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px">' + blk.label + '</div>'
+      + '<div class="inc">';
+    for (var ii = 0; ii < blk.items.length; ii++) {
+      var it = blk.items[ii];
+      incH += '<div class="ir"><div class="idot" style="background:' + it.dot + '"></div>'
+        + '<div class="in">' + it.name + '</div>'
+        + '<div class="ia" style="color:' + (it.color || '#2D5A3D') + '">+' + fmt(it.amt) + '</div></div>';
     }
-  });
-  incHTML += `<div style="background:var(--ink);color:#fff;border-radius:var(--r);padding:12px 16px;margin-top:4px;display:flex;justify-content:space-between;align-items:center">
-    <div>
-      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-bottom:4px">รายได้รวมทั้งหมดเดือนนี้</div>
-      <div style="font-family:var(--mono);font-size:22px;font-weight:500;color:#7de0a4">${m.incomeTotal.toLocaleString()} ฿</div>
-    </div>
-    <div style="text-align:right">
-      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-bottom:2px">${m.incomeTotalNote}</div>
-    </div>
-  </div>`;
+    incH += '</div>';
 
-  // Expense tabs HTML
-  const expHTML = `
-  <div class="sec">รายจ่ายแยกหมวด</div>
-  <div class="tab-row">
-    ${['daily','fixed','saving','transfer'].map((z,i)=>{
-      const labels = ['รายจ่าย<br>ประจำวัน','รายจ่าย<br>คงที่','ออม/<br>ลงทุน','ย้ายเงิน<br>(เหมียวจด)'];
-      return `<button class="tb${activeTab===z?' on':''}" onclick="activeTab='${z}';renderExpenses()">${labels[i]}</button>`;
-    }).join('')}
-  </div>
-  <div id="bsum" class="bsum"></div>
-  <div class="cats" id="cats"></div>
+    if (blk.deductions) {
+      incH += '<div style="background:var(--sf);border:1px solid var(--bd);border-top:none;border-radius:0 0 var(--r) var(--r);padding:10px 14px;margin-bottom:10px">'
+        + '<div style="font-size:11px;color:var(--ink3);margin-bottom:4px">หักก่อนเข้า KTB:</div>'
+        + '<div style="display:grid;grid-template-columns:1fr auto;gap:3px 12px;font-size:11px;color:var(--ink3);padding-left:8px">';
+      for (var di = 0; di < blk.deductions.length; di++) {
+        var dd = blk.deductions[di];
+        incH += '<span>' + dd.name + '</span><span style="font-family:var(--mono)">' + dd.amt.toLocaleString() + '</span>';
+      }
+      incH += '</div><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;padding-top:8px;border-top:1px solid var(--bd)">'
+        + '<span>NET เข้า KTB</span>'
+        + '<span style="font-family:var(--mono);color:var(--green)">+' + fmt(blk.net) + ' บาท</span>'
+        + '</div></div>';
+    } else {
+      incH += '<div style="margin-bottom:10px"></div>';
+    }
+  }
+  incH += '<div style="background:var(--ink);color:#fff;border-radius:var(--r);padding:12px 16px;display:flex;justify-content:space-between;align-items:center">'
+    + '<div><div style="font-size:10px;color:rgba(255,255,255,.5);margin-bottom:4px">รายได้รวม</div>'
+    + '<div style="font-family:var(--mono);font-size:22px;font-weight:500;color:#7de0a4">' + fmt(totalInc) + ' บาท</div></div>'
+    + '<div style="font-size:10px;color:rgba(255,255,255,.45)">' + noteParts.join(' + ') + '</div>'
+    + '</div>';
 
-  <div class="sec">ภาพรวมการจัดสรรเงิน</div>
-  <div class="chart-wrap">
-    <div class="chart-ttl">ภาพรวมการจัดสรรเงิน ${m.label}</div>
-    <div class="chart-sub">ครอบคลุม 4 zones · เลื่อนเมาส์ดูรายละเอียด</div>
-    <div class="chart-body">
-      <div class="donut-wrap">
-        <svg id="donut" width="240" height="240" viewBox="0 0 240 240" style="transform:rotate(-90deg)"></svg>
-        <div class="donut-center">
-          <div class="dc-amt" id="dc-amt">—</div>
-          <div class="dc-lbl" id="dc-lbl">จัดสรรรวม</div>
-        </div>
-      </div>
-      <div class="chart-leg" id="cleg"></div>
-    </div>
-  </div>
+  // Tabs + chart shell (no inline onclick - will add via addEventListener)
+  var tabKeys   = ['daily', 'fixed', 'saving', 'transfer'];
+  var tabLabels = ['รายจ่าย<br>ประจำวัน', 'รายจ่าย<br>คงที่', 'ออม/<br>ลงทุน', 'ย้ายเงิน<br>(เหมียวจด)'];
+  var tabHtml = '';
+  for (var ti = 0; ti < tabKeys.length; ti++) {
+    tabHtml += '<button class="tb' + (activeTab === tabKeys[ti] ? ' on' : '') + '" data-tab="' + tabKeys[ti] + '">' + tabLabels[ti] + '</button>';
+  }
 
-  <div class="sec">วิเคราะห์โดย AI</div>
-  <div class="ins">
-    <div class="ins-l">สรุป${m.label} — เหมียวจด + KTC + Payslip</div>
-    <div class="ins-t">${m.insight}</div>
-  </div>
-  <div class="spacer"></div>`;
+  var expH = '<div class="sec">รายจ่ายแยกหมวด</div>'
+    + '<div class="tab-row" id="tab-row">' + tabHtml + '</div>'
+    + '<div id="bsum" class="bsum"></div>'
+    + '<div class="cats" id="cats"></div>'
+    + '<div class="sec">ภาพรวมการจัดสรรเงิน</div>'
+    + '<div class="chart-wrap">'
+    + '<div class="chart-ttl">ภาพรวม ' + m.label + '</div>'
+    + '<div class="chart-sub">วงนอก=รายได้ · วงกลาง=การจัดสรร · วงใน=รายละเอียด · % ของรายได้รวม</div>'
+    + '<div style="display:flex;flex-direction:column;align-items:center">'
+    + '<div class="donut-wrap">'
+    + '<svg id="donut" width="260" height="260" viewBox="0 0 260 260" style="transform:rotate(-90deg)"></svg>'
+    + '<div class="donut-center">'
+    + '<div class="dc-lbl2" id="dc-lbl2">รายได้รวม</div>'
+    + '<div class="dc-amt" id="dc-amt">' + fmt(m.chart.incomeRef) + '</div>'
+    + '<div class="dc-pct" id="dc-pct"></div>'
+    + '<div class="dc-lbl" id="dc-lbl">บาท/เดือน</div>'
+    + '</div></div>'
+    + '<div id="cleg" style="display:flex;flex-direction:column;gap:2px;width:100%;margin-top:14px;padding-top:12px;border-top:1px solid var(--bd2)"></div>'
+    + '</div></div>'
+    + '<div class="sec">วิเคราะห์</div>'
+    + '<div class="ins"><div class="ins-l">สรุป ' + m.label + '</div>'
+    + '<div class="ins-t">' + m.insight + '</div></div>'
+    + '<div class="spacer"></div>';
 
-  el.innerHTML = incHTML + expHTML;
+  panel.innerHTML = incH + expH;
+
+  // Add tab click listeners (no inline onclick)
+  var tabs = el('tab-row').querySelectorAll('.tb');
+  for (var i = 0; i < tabs.length; i++) {
+    (function(tab) {
+      tab.addEventListener('click', function() {
+        activeTab = tab.getAttribute('data-tab');
+        renderExpenses();
+      });
+    })(tabs[i]);
+  }
+
   renderExpenses();
   buildDonut();
 }
 
-// ═══════════════════════════════════════════════════════════════
-// EXPENSES
-// ═══════════════════════════════════════════════════════════════
+// ============================================================
+// RENDER EXPENSES
+// ============================================================
 function renderExpenses() {
-  const key = MONTHS_ORDER[currentIdx];
-  const m   = MONTHS[key];
+  var key = MONTHS_ORDER[currentIdx];
+  var m = MONTHS[key];
   if (!m) return;
 
-  // Update tab buttons
-  document.querySelectorAll('.tb').forEach((b,i)=>{
-    b.classList.toggle('on', ['daily','fixed','saving','transfer'][i]===activeTab);
-  });
+  var Z = m.expenses;
+  var d = Z[activeTab];
+  if (!d) return;
 
-  const Z = m.expenses;
-  const d = Z[activeTab];
-  const bEl = document.getElementById('bsum');
-  const cEl = document.getElementById('cats');
-  if (!bEl||!cEl) return;
-
-  if (d.isTransfer) {
-    bEl.innerHTML=`<div style="background:var(--pl);border:1px solid rgba(91,63,168,.2);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--purple);line-height:1.6">
-      📌 <strong>รายการย้ายเงิน ไม่นับเป็นรายจ่าย</strong> — โอนระหว่างบัญชีตัวเองเพื่อวางแผน<br>
-      รวม <span style="font-family:var(--mono)">${d.total.toLocaleString()} บาท</span></div>`;
-  } else if (d.isSaving) {
-    bEl.innerHTML=`<div style="background:var(--bl);border:1px solid rgba(27,95,168,.2);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--blue);line-height:1.7">
-      💾 เหมียวจดบันทึกว่าออมเงิน/ลงทุน <strong style="font-family:var(--mono)">${d.cats[0].a.toLocaleString()} บาท</strong><br>
-      ประกอบด้วย: <strong>🥇 กองทุนทอง SCBGOLDHR RMF</strong> + <strong>📈 US Stock / Dime</strong></div>`;
-  } else {
-    const rows = d.srows.filter(r=>r.a!==null);
-    const ov = d.actualTotal>d.budgetTotal, diff = d.actualTotal-d.budgetTotal;
-    let h=`<div class="bsum-hdr"><span>หมวดหมู่</span><span style="display:flex;gap:12px"><span>งบ</span><span>จริง</span><span>ส่วนต่าง</span></span></div>`;
-    rows.forEach(r=>{const ro=r.a>r.b,df=r.a-r.b,cl=ro?'ov':'ok';
-      h+=`<div class="br"><span class="bl">${r.l}</span><span class="bv"><span class="bb">${r.b.toLocaleString()}</span><span class="ba ${cl}">${r.a.toLocaleString()}</span><span class="bd-v ${cl}">${df>0?'+':''}${df.toLocaleString()}</span></span></div>`;});
-    const tc=ov?'ov':'ok';
-    h+=`<div class="br" style="padding-top:6px;margin-top:2px;border-top:1px solid var(--bd)"><span class="bl" style="font-weight:600">รวม</span><span class="bv"><span class="bb">${d.budgetTotal.toLocaleString()}</span><span class="ba ${tc}" style="font-weight:600">${d.actualTotal.toLocaleString()}</span><span class="bd-v ${tc}">${diff>0?'+':''}${diff.toLocaleString()}</span></span></div>`;
-    if(d.note)h+=`<div style="font-size:11px;color:var(--ink3);margin-top:8px;padding-top:6px;border-top:1px solid var(--bd2)">📝 ${d.note}</div>`;
-    bEl.innerHTML=h;
+  // Update tab active state
+  var tabRow = el('tab-row');
+  if (tabRow) {
+    var tabs = tabRow.querySelectorAll('.tb');
+    for (var i = 0; i < tabs.length; i++) {
+      var isActive = tabs[i].getAttribute('data-tab') === activeTab;
+      tabs[i].className = 'tb' + (isActive ? ' on' : '');
+    }
   }
 
-  cEl.innerHTML='';
-  d.cats.forEach((cat,idx)=>{
-    const isSv=d.isSaving, isTr=d.isTransfer;
-    const bval=cat.b||cat.a||1;
-    const pct=isTr?(cat.a/(d.total||1)*100):(cat.a?Math.min(cat.a/bval*100,100):0);
-    const isOver=!isSv&&!isTr&&cat.a>(cat.b||0);
-    const amtCls=isTr?'t':(isSv?'s':(isOver?'e':'o'));
-    const biTxt=isTr?(cat.note||''):(isSv?(cat.a?`${Math.round(cat.a/(d.cats[0].a||1)*100)}% ของออมทั้งหมด`:'รอยอด'):
-      (isOver?`เกินงบ +${(cat.a-(cat.b||0)).toLocaleString()}`:`เหลือ ${((cat.b||0)-cat.a).toLocaleString()}`));
-    const biCls=isTr?'tr':(isSv?'sv':(isOver?'ov':'ok'));
-    const txH=cat.t.map(tx=>`<div class="tx"><span class="tx-d">${tx.d}</span><span class="tx-n">${tx.n}</span><span class="tx-a ${tx.s==='mv'?'t':'m'}">${tx.a!=null?tx.a.toLocaleString()+' ฿':'รอข้อมูล'}</span><span class="tx-s ${tx.s}">${tx.s==='mv'?'ย้าย':tx.s.toUpperCase()}</span></div>`).join('');
-    const subH=cat.sub?`<div class="tx-note" style="color:var(--ink3)">📝 ${cat.sub}</div>`:'';
-    const displayAmt=cat.a?`${isTr?'':cat.a>0?'+':'-'}${Math.abs(cat.a).toLocaleString()}`:'—';
-    const el=document.createElement('div');
-    el.className='cc';el.style.animationDelay=(idx*.04+.02)+'s';
-    el.innerHTML=`<div class="cc-h" onclick="this.parentElement.classList.toggle('on')"><span class="cc-i">${cat.i}</span><div class="cc-inf"><div class="cc-n">${cat.n}</div><div class="cc-bar"><div class="cc-f ${cat.f}" style="width:${pct}%"></div></div></div><div class="cc-r"><div class="cc-a ${amtCls}">${displayAmt}</div><div class="cc-b ${biCls}">${biTxt}</div></div><span class="cc-chv">▼</span></div><div class="txl"><div class="tx-h"><span>วันที่ · รายการ</span><span>แหล่ง</span></div>${txH}${subH}</div>`;
-    cEl.appendChild(el);
-  });
-}
+  var bEl = el('bsum');
+  var cEl = el('cats');
+  if (!bEl || !cEl) return;
 
-// ═══════════════════════════════════════════════════════════════
-// DONUT CHART
-// ═══════════════════════════════════════════════════════════════
-function buildDonut() {
-  const key = MONTHS_ORDER[currentIdx];
-  const m   = MONTHS[key];
-  if (!m) return;
-  const CD  = m.chartData;
+  // Summary box
+  if (d.isTransfer) {
+    bEl.innerHTML = '<div style="background:var(--pl);border:1px solid rgba(91,63,168,.2);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--purple);line-height:1.6">'
+      + 'รายการย้ายเงิน ไม่นับเป็นรายจ่าย รวม <strong>' + fmt(d.total) + ' บาท</strong></div>';
+  } else if (d.isSaving) {
+    bEl.innerHTML = '<div style="background:var(--bl);border:1px solid rgba(27,95,168,.2);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--blue);line-height:1.7">'
+      + 'ออม/ลงทุน <strong>' + fmt(d.cats[0].a) + ' บาท (' + m.hdr.savingRate + '% ของรายรับ KTB)</strong><br>' + d.note + '</div>';
+  } else {
+    var rows = [];
+    for (var ri = 0; ri < d.srows.length; ri++) {
+      if (d.srows[ri].a !== null) rows.push(d.srows[ri]);
+    }
+    var ov = d.actualTotal > d.budgetTotal;
+    var diff = d.actualTotal - d.budgetTotal;
+    var h = '<div class="bsum-hdr"><span>หมวด</span><span style="display:flex;gap:12px"><span>งบ</span><span>จริง</span><span>ส่วนต่าง</span></span></div>';
+    for (var k = 0; k < rows.length; k++) {
+      var rr = rows[k];
+      var ro = rr.a > rr.b, df = rr.a - rr.b, cl = ro ? 'ov' : 'ok';
+      h += '<div class="br"><span class="bl">' + rr.l + '</span><span class="bv"><span class="bb">' + fmt(rr.b) + '</span><span class="ba ' + cl + '">' + fmt(rr.a) + '</span><span class="bd-v ' + cl + '">' + (df > 0 ? '+' : '') + fmt(df) + '</span></span></div>';
+    }
+    var tc = ov ? 'ov' : 'ok';
+    h += '<div class="br" style="padding-top:6px;border-top:1px solid var(--bd)"><span class="bl" style="font-weight:600">รวม</span><span class="bv"><span class="bb">' + fmt(d.budgetTotal) + '</span><span class="ba ' + tc + '">' + fmt(d.actualTotal) + '</span><span class="bd-v ' + tc + '">' + (diff > 0 ? '+' : '') + fmt(diff) + '</span></span></div>';
+    if (d.note) h += '<div style="font-size:11px;color:var(--ink3);margin-top:8px;padding-top:6px;border-top:1px solid var(--bd2)">' + d.note + '</div>';
+    bEl.innerHTML = h;
+  }
 
-  const svg=document.getElementById('donut');
-  const leg=document.getElementById('cleg');
-  if(!svg||!leg) return;
+  // Category cards
+  cEl.innerHTML = '';
+  for (var ci = 0; ci < d.cats.length; ci++) {
+    var cat = d.cats[ci];
+    var isSv = !!d.isSaving, isTr = !!d.isTransfer;
+    var pct = isSv ? m.hdr.savingRate : isTr ? (cat.a / (d.total || 1) * 100) : (cat.b ? Math.min(cat.a / cat.b * 100, 100) : 0);
+    var isOver = !isSv && !isTr && cat.a > (cat.b || 0);
+    var amtCls = isTr ? 't' : (isSv ? 's' : (isOver ? 'e' : 'o'));
+    var biTxt = isTr ? (cat.note || '') : isSv ? (m.hdr.savingRate + '% ของรายรับ KTB') : (isOver ? 'เกินงบ +' + fmt(cat.a - (cat.b || 0)) : 'เหลือ ' + fmt((cat.b || 0) - cat.a));
+    var biCls = isTr ? 'tr' : (isSv ? 'sv' : (isOver ? 'ov' : 'ok'));
 
-  const cx=120,cy=120,OR=108,OW=26,IR=74,IW=20;
-  const total=CD.reduce((s,z)=>s+z.amt,0);
-  const C_out=2*Math.PI*OR, C_in=2*Math.PI*IR;
-  let outOff=0, paths='', legH='';
+    var txH = '';
+    for (var txi = 0; txi < cat.t.length; txi++) {
+      var tx = cat.t[txi];
+      var txAmt = tx.a != null ? tx.a.toLocaleString() + ' บาท' : 'รอข้อมูล';
+      var txBadge = tx.s === 'mv' ? 'ย้าย' : tx.s.toUpperCase();
+      txH += '<div class="tx"><span class="tx-d">' + tx.d + '</span><span class="tx-n">' + tx.n + '</span>'
+        + '<span class="tx-a ' + (tx.s === 'mv' ? 't' : 'm') + '">' + txAmt + '</span>'
+        + '<span class="tx-s ' + tx.s + '">' + txBadge + '</span></div>';
+    }
+    var subH = cat.sub ? '<div class="tx-note" style="color:var(--ink3)">' + cat.sub + '</div>' : '';
+    var dispAmt = cat.a ? fmt(Math.abs(cat.a)) : '-';
 
-  CD.forEach((zone,zi)=>{
-    const zFrac=zone.amt/total;
-    const zLen_o=zFrac*C_out, zLen_i=zFrac*C_in;
-    const pct=Math.round(zFrac*100);
-    paths+=`<circle cx="${cx}" cy="${cy}" r="${OR}" fill="none" stroke="${zone.c}" stroke-width="${OW}" stroke-dasharray="${zLen_o-2} ${C_out-(zLen_o-2)}" stroke-dashoffset="${-outOff}" style="cursor:pointer" onmouseenter="hl(${zi},-1,'${key}')" onmouseleave="rst('${key}')"/>`;
-    const subTotal=zone.subs.reduce((s,sub)=>s+sub.a,0);
-    let inOff=outOff/C_out*C_in;
-    zone.subs.forEach(sub=>{
-      const sLen=sub.a/subTotal*zLen_i;
-      paths+=`<circle cx="${cx}" cy="${cy}" r="${IR}" fill="none" stroke="${sub.c}" stroke-width="${IW}" stroke-dasharray="${sLen-1.5} ${C_in-(sLen-1.5)}" stroke-dashoffset="${-inOff}" style="cursor:pointer" onmouseenter="hl(${zi},'${sub.n}','${key}')" onmouseleave="rst('${key}')"/>`;
-      inOff+=sLen;
+    var cc = document.createElement('div');
+    cc.className = 'cc';
+    cc.style.animationDelay = (ci * 0.05) + 's';
+    cc.innerHTML = '<div class="cc-h">'
+      + '<span class="cc-i">' + cat.i + '</span>'
+      + '<div class="cc-inf"><div class="cc-n">' + cat.n + '</div>'
+      + '<div class="cc-bar"><div class="cc-f ' + cat.f + '" style="width:' + pct + '%"></div></div></div>'
+      + '<div class="cc-r"><div class="cc-a ' + amtCls + '">' + dispAmt + '</div><div class="cc-b ' + biCls + '">' + biTxt + '</div></div>'
+      + '<span class="cc-chv">&#9660;</span></div>'
+      + '<div class="txl"><div class="tx-h"><span>วันที่ · รายการ</span><span>แหล่ง</span></div>' + txH + subH + '</div>';
+
+    // Use addEventListener (no inline onclick)
+    var header = cc.querySelector('.cc-h');
+    header.addEventListener('click', function(e) {
+      e.currentTarget.parentElement.classList.toggle('on');
     });
-    outOff+=zLen_o;
-    legH+=`<div class="cl-item" onmouseenter="hl(${zi},-1,'${key}')" onmouseleave="rst('${key}')"><div class="cl-dot" style="background:${zone.c}"></div><span class="cl-name">${zone.name}</span><span class="cl-amt">${zone.amt.toLocaleString()} ฿</span><span class="cl-pct">${pct}%</span></div>`;
-  });
-  paths+=`<circle cx="${cx}" cy="${cy}" r="${IR-IW/2-2}" fill="white"/>`;
-  svg.innerHTML=paths;
-  leg.innerHTML=legH;
-  rst(key);
-}
-function hl(zi,sub,key){
-  const zone=MONTHS[key].chartData[zi];
-  if(sub===-1){document.getElementById('dc-amt').textContent=zone.amt.toLocaleString();document.getElementById('dc-lbl').textContent=zone.name;}
-  else{const s=zone.subs.find(x=>x.n===sub)||zone.subs[0];document.getElementById('dc-amt').textContent=s.a.toLocaleString();document.getElementById('dc-lbl').textContent=s.n;}
-}
-function rst(key){
-  const total=MONTHS[key].chartData.reduce((s,z)=>s+z.amt,0);
-  document.getElementById('dc-amt').textContent=total.toLocaleString();
-  document.getElementById('dc-lbl').textContent='จัดสรรรวมทั้งหมด';
+
+    cEl.appendChild(cc);
+  }
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ============================================================
+// DONUT CHART — no inline event handlers
+// ============================================================
+var _donutKey = null; // track which month donut belongs to
+
+function rstD() {
+  var m = MONTHS[MONTHS_ORDER[currentIdx]];
+  var dcAmt = el('dc-amt');
+  if (!m || !dcAmt) return;
+  el('dc-lbl2').textContent = 'รายได้รวม';
+  dcAmt.textContent = fmt(m.chart.incomeRef);
+  el('dc-pct').textContent = '';
+  el('dc-lbl').textContent = 'บาท/เดือน';
+}
+
+function buildDonut() {
+  var key = MONTHS_ORDER[currentIdx];
+  var m = MONTHS[key];
+  if (!m) return;
+  var ch = m.chart;
+  var svg = el('donut');
+  var leg = el('cleg');
+  if (!svg || !leg) return;
+
+  _donutKey = key;
+
+  var cx = 130, cy = 130;
+  var RA = 122, RAsw = 12;
+  var RB = 103, RBsw = 24;
+  var RC = 74,  RCsw = 18;
+  var CA = 2 * Math.PI * RA;
+  var CB = 2 * Math.PI * RB;
+  var CC = 2 * Math.PI * RC;
+  var incRef = ch.incomeRef;
+  var zoneTotal = 0;
+  for (var zi = 0; zi < ch.zones.length; zi++) zoneTotal += ch.zones[zi].amt;
+
+  var paths = '';
+  var offA = 0, offB = 0;
+
+  // Ring A — income sources (data-type="income" data-si=N)
+  for (var si = 0; si < ch.incomeSources.length; si++) {
+    var src = ch.incomeSources[si];
+    var lenA = src.amt / incRef * CA;
+    paths += '<circle cx="' + cx + '" cy="' + cy + '" r="' + RA + '" fill="none"'
+      + ' stroke="' + src.c + '" stroke-width="' + RAsw + '"'
+      + ' stroke-dasharray="' + (lenA - 1.5) + ' ' + (CA - (lenA - 1.5)) + '"'
+      + ' stroke-dashoffset="' + (-offA) + '" style="cursor:pointer"'
+      + ' data-type="income" data-si="' + si + '"/>';
+    offA += lenA;
+  }
+
+  // Ring B — zones + Ring C — subs
+  for (var zi2 = 0; zi2 < ch.zones.length; zi2++) {
+    var zone = ch.zones[zi2];
+    var zFrac = zone.amt / zoneTotal;
+    var zLenB = zFrac * CB;
+    paths += '<circle cx="' + cx + '" cy="' + cy + '" r="' + RB + '" fill="none"'
+      + ' stroke="' + zone.c + '" stroke-width="' + RBsw + '"'
+      + ' stroke-dasharray="' + (zLenB - 2) + ' ' + (CB - (zLenB - 2)) + '"'
+      + ' stroke-dashoffset="' + (-offB) + '" style="cursor:pointer"'
+      + ' data-type="zone" data-zi="' + zi2 + '"/>';
+
+    var subTotal = 0;
+    for (var s = 0; s < zone.subs.length; s++) subTotal += zone.subs[s].a;
+    var offC = offB / CB * CC;
+    for (var si2 = 0; si2 < zone.subs.length; si2++) {
+      var sub = zone.subs[si2];
+      var sLen = (sub.a / subTotal) * zFrac * CC;
+      paths += '<circle cx="' + cx + '" cy="' + cy + '" r="' + RC + '" fill="none"'
+        + ' stroke="' + sub.c + '" stroke-width="' + RCsw + '"'
+        + ' stroke-dasharray="' + (sLen - 1) + ' ' + (CC - (sLen - 1)) + '"'
+        + ' stroke-dashoffset="' + (-offC) + '" style="cursor:pointer"'
+        + ' data-type="sub" data-zi="' + zi2 + '" data-si2="' + si2 + '"/>';
+      offC += sLen;
+    }
+    offB += zLenB;
+  }
+
+  // White center
+  paths += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (RC - RCsw / 2 - 3) + '" fill="white"/>';
+  svg.innerHTML = paths;
+
+  // Add event listeners to all circles (NO inline handlers)
+  var circles = svg.querySelectorAll('circle[data-type]');
+  for (var ci = 0; ci < circles.length; ci++) {
+    (function(circle) {
+      var type = circle.getAttribute('data-type');
+      var ziIdx  = parseInt(circle.getAttribute('data-zi')  || '0', 10);
+      var siIdx  = parseInt(circle.getAttribute('data-si')  || '0', 10);
+      var si2Idx = parseInt(circle.getAttribute('data-si2') || '0', 10);
+
+      function onEnter() {
+        var cm = MONTHS[MONTHS_ORDER[currentIdx]];
+        var dcAmt = el('dc-amt');
+        if (!cm || !dcAmt) return;
+        var ch2 = cm.chart;
+        if (type === 'income') {
+          var src2 = ch2.incomeSources[siIdx];
+          el('dc-lbl2').textContent = 'รายได้';
+          dcAmt.textContent = fmt(src2.amt);
+          el('dc-pct').textContent = (src2.amt / ch2.incomeRef * 100).toFixed(1) + '%';
+          el('dc-lbl').textContent = src2.name;
+        } else if (type === 'zone') {
+          var z2 = ch2.zones[ziIdx];
+          el('dc-lbl2').textContent = 'การจัดสรร';
+          dcAmt.textContent = fmt(z2.amt);
+          el('dc-pct').textContent = (z2.amt / ch2.incomeRef * 100).toFixed(1) + '%';
+          el('dc-lbl').textContent = z2.name;
+        } else if (type === 'sub') {
+          var sub2 = ch2.zones[ziIdx].subs[si2Idx];
+          el('dc-lbl2').textContent = 'รายละเอียด';
+          dcAmt.textContent = fmt(sub2.a);
+          el('dc-pct').textContent = (sub2.a / ch2.incomeRef * 100).toFixed(1) + '%';
+          el('dc-lbl').textContent = sub2.n;
+        }
+      }
+
+      circle.addEventListener('mouseenter', onEnter);
+      circle.addEventListener('mouseleave', rstD);
+      circle.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        onEnter();
+      }, {passive: false});
+      circle.addEventListener('touchend', rstD, {passive: true});
+    })(circles[ci]);
+  }
+
+  // Legend
+  var legH = '<div class="leg-sec-ttl">รายได้ (วงแหวนนอก)</div>';
+  for (var i = 0; i < ch.incomeSources.length; i++) {
+    var s2 = ch.incomeSources[i];
+    legH += '<div class="cl-item"><div class="cl-dot circle" style="background:' + s2.c + '"></div>'
+      + '<span class="cl-name" style="color:var(--ink2)">' + s2.name + '</span>'
+      + '<span class="cl-amt">' + fmt(s2.amt) + ' บาท</span>'
+      + '<span class="cl-pct" style="color:var(--green)">' + (s2.amt / incRef * 100).toFixed(1) + '%</span></div>';
+  }
+  legH += '<div class="leg-sec-ttl" style="margin-top:6px">การจัดสรร (วงแหวนกลาง) % ของรายได้รวม</div>';
+  for (var j = 0; j < ch.zones.length; j++) {
+    var z3 = ch.zones[j];
+    legH += '<div class="cl-item"><div class="cl-dot" style="background:' + z3.c + '"></div>'
+      + '<span class="cl-name">' + z3.name + '</span>'
+      + '<span class="cl-amt">' + fmt(z3.amt) + ' บาท</span>'
+      + '<span class="cl-pct">' + (z3.amt / incRef * 100).toFixed(1) + '%</span></div>';
+  }
+  legH += '<div class="chart-note">* % จากรายได้รวม ' + fmt(incRef) + ' บาท</div>';
+  leg.innerHTML = legH;
+  rstD();
+}
+
+// ============================================================
 // RENDER ALL
-// ═══════════════════════════════════════════════════════════════
+// ============================================================
 function renderAll() {
-  const key = MONTHS_ORDER[currentIdx];
-  const m   = MONTHS[key];
+  var key = MONTHS_ORDER[currentIdx];
+  var m   = MONTHS[key];
   renderNav();
-  renderHeader(m);
-  renderAssets(m);
-  renderMain(m);
+  renderHeader(m, key);
+  renderAssets(m, key);
+  renderMain(m, key);
 }
 
+// ============================================================
+// EVENTS — keyboard + swipe
+// ============================================================
+el('btn-prev').addEventListener('click', function() { changeMonth(-1); });
+el('btn-next').addEventListener('click', function() { changeMonth(1); });
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowLeft')  changeMonth(-1);
+  if (e.key === 'ArrowRight') changeMonth(1);
+});
+
+var _tx = 0, _ty = 0;
+document.addEventListener('touchstart', function(e) {
+  _tx = e.touches[0].clientX;
+  _ty = e.touches[0].clientY;
+}, {passive: true});
+document.addEventListener('touchend', function(e) {
+  var dx = _tx - e.changedTouches[0].clientX;
+  var dy = _ty - e.changedTouches[0].clientY;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 55) changeMonth(dx > 0 ? 1 : -1);
+}, {passive: true});
+
+// ============================================================
 // INIT
+// ============================================================
 renderAll();
 </script>
 </body>
