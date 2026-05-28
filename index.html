@@ -162,6 +162,24 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:15p
 .me-ttl{font-size:18px;font-weight:600;color:var(--ink3);margin-bottom:8px}
 .me-sub{font-size:13px;color:var(--ink3);line-height:1.7}
 .spacer{height:32px}
+.flow-row{display:flex;align-items:center;gap:5px;margin-top:4px;flex-wrap:wrap}
+.flow-chip{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:600;white-space:nowrap}
+.flow-pos{background:rgba(45,160,80,.2);color:#7de0a4}
+.flow-neg{background:rgba(192,57,43,.2);color:#ff8a7a}
+.flow-neu{background:rgba(160,152,144,.15);color:rgba(255,255,255,.3)}
+.flow-lbl{font-size:9px;color:rgba(255,255,255,.28);line-height:1.4}
+.risk-tag{font-size:9px;padding:2px 6px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;margin-top:3px;font-weight:500}
+.risk-low{background:rgba(45,160,80,.18);color:#7de0a4}
+.risk-high{background:rgba(192,57,43,.2);color:#ff8a7a}
+.goal-tag{font-size:9px;color:rgba(255,255,255,.3);margin-top:3px;line-height:1.5}
+.fund-alloc{font-family:var(--mono);font-size:10px;color:#c4b0ff;margin-top:2px}
+.alloc-box{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;margin-top:10px}
+.alloc-title{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:7px}
+.alloc-row{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:10px;color:rgba(255,255,255,.5)}
+.alloc-pct{font-family:var(--mono);font-size:10px;font-weight:600;min-width:32px}
+.alloc-bar-wrap{flex:1;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.alloc-bar{height:100%;border-radius:2px}
+.fund-new{background:rgba(255,210,50,.08);border:1px solid rgba(255,210,50,.2);border-radius:10px;padding:10px 12px}
 @keyframes fu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
@@ -208,16 +226,40 @@ function calcNetWorth(m) {
   var a = m.assets, r = m.rates;
   var usThb = Math.round(a.us.usd * r.usdThb);
   var michelinThb = Math.round(a.michelin.eur * r.eurThb);
-  var total = a.emergency.amt + a.daily.amt + a.gold.amt + usThb + a.pvd.amt + michelinThb + a.sso.amt;
-  return { total: total, netWorth: total - m.debt.loan.total, usThb: usThb, michelinThb: michelinThb };
+  // Auto-calculate fund values from units × nav if available
+  if (a.kfsmart && a.kfsmart.units && a.kfsmart.nav) {
+    a.kfsmart.amt = Math.round(a.kfsmart.units * a.kfsmart.nav);
+  }
+  if (a.useq && a.useq.units && a.useq.nav) {
+    a.useq.amt = Math.round(a.useq.units * a.useq.nav);
+  }
+  var kfsmartAmt = (a.kfsmart && a.kfsmart.amt) || 0;
+  var useqAmt    = (a.useq    && a.useq.amt)    || 0;
+  var total = a.emergency.amt + a.daily.amt + a.gold.amt + usThb + a.pvd.amt + michelinThb + a.sso.amt + kfsmartAmt + useqAmt;
+  return { total:total, netWorth:total-m.debt.loan.total, usThb:usThb, michelinThb:michelinThb, kfsmartAmt:kfsmartAmt, useqAmt:useqAmt };
 }
 
-function assetCard(icon, label, primary, sub, liq) {
+function assetCard(icon, label, primary, sub, liq, flowHtml) {
+  flowHtml = flowHtml || '';
   return '<div class="asset-card">'
     + '<div class="asset-lbl">' + icon + ' ' + label + '</div>'
     + '<div class="asset-amt">' + primary + '</div>'
+    + flowHtml
     + '<div class="asset-sub">' + sub + '</div>'
     + '<div class="liq-tag ' + LIQ[liq].cls + '">' + LIQ[liq].label + '</div>'
+    + '</div>';
+}
+
+// Monthly flow badge: delta=number, label=description, sign forced for zero
+function flowChip(delta, label) {
+  if (delta === null || delta === undefined) return '';
+  var cls, prefix;
+  if (delta > 0)      { cls = 'flow-pos'; prefix = '+ '; }
+  else if (delta < 0) { cls = 'flow-neg'; prefix = '- '; }
+  else                { cls = 'flow-neu'; prefix = ''; }
+  return '<div class="flow-row">'
+    + '<span class="flow-chip ' + cls + '">' + prefix + fmt(Math.abs(delta)) + ' บาท</span>'
+    + (label ? '<span class="flow-lbl">' + label + '</span>' : '')
     + '</div>';
 }
 
@@ -234,13 +276,14 @@ var MONTHS = {
   lastUpdated: '26/05/2569',
   rates: { eurThb: 38.00, usdThb: 32.58 },
   hdr: {
-    netPayment:38175,  netPaymentSub:'Total earn 46,068 - หัก 7,893',
-    ktbExp:28906,      ktbExpSub:'ออม 25,552 + ใช้ชีวิต 3,354',
-    ktcCharges:12993,  ktcDue:'4 มิ.ย. 2026',
-    transfers:38500,   transfersSub:'ฉุกเฉิน 22,000 + ลงทุน 16,500',
+    salaryEarning:46068, earningsSub:'Base 36,950 + OT 7,548 + Allowance 1,570',
+    ktbExp:28906,        ktbExpSub:'ออม 25,552 + ใช้ชีวิต 3,354',
+    ktcCharges:12993,    ktcDue:'4 มิ.ย. 2026',
+    salaryDeduction:7893, deductionSub:'BIB 2,085 + PVD 2,956 + SS 875 + Tax 1,284 + กรอ. 693',
+    netToKTB:38175,
     savingRate:71.3,
     savingDetail:'เหมียวจด 25,552 / 35,850',
-    savingNote:'OT สูง: 7,548 บาท - Total earnings 46,068',
+    savingNote:'NET เข้า KTB 38,175 · รวมลงทุนทั้งหมด 31,468 บาท',
   },
   assets: {
     emergency:{amt:67016, note:'KTB Next Saving', liquidity:'high'},
@@ -250,6 +293,20 @@ var MONTHS = {
     pvd:      {amt:175177,ytd:2.90, note:'ณ 15/05/2569 TISCO+UOBAM ตน.ปี 147,746', liquidity:'low'},
     michelin: {eur:5743.71,shares:189,price:30.390,date:'26/05/2026',liquidity:'locked'},
     sso:      {amt:40215, note:'ยอดชราภาพสะสม', liquidity:'low'},
+    // ── กองทุนรวม (Dime App) — อัปเดต units + nav ทุกเดือน ──────────
+    // amt จะคำนวณอัตโนมัติจาก units × nav
+    kfsmart: {
+      units:0, nav:0, amt:0, cost:0,
+      fullName:'Krungsri Smart Fixed Income Fund-A',
+      purpose:'ท่องเที่ยว / รถ', allocPct:20, risk:'1/8',
+      platform:'Dime App', started:false, liquidity:'medium',
+    },
+    useq: {
+      units:0, nav:0, amt:0, cost:0,
+      fullName:'Principal US Equity Fund-A',
+      purpose:'บ้าน (ระยะยาว)', allocPct:10, risk:'6/8',
+      platform:'Dime App', started:false, liquidity:'medium',
+    },
   },
   debt: { loan: { principal:192110, interest:611, total:192721 } },
   income: [
@@ -286,24 +343,43 @@ var MONTHS = {
         {i:'🏃',n:'วิ่ง / กีฬา',b:700,a:578,f:'o',sub:null,
          t:[{d:'03/05',n:'Thai.run (สมัครวิ่ง)',a:-578,s:'ktc'}]},
       ]},
-    fixed:{label:'รายจ่ายคงที่',budgetTotal:2500,actualTotal:2032,
-      note:'จาก KTC - กรอ./PVD/SS หักจากสลิปแล้ว',
+    fixed:{label:'รายจ่ายคงที่',budgetTotal:3316,actualTotal:4009,
+      note:'KTC: ประกัน+Subscription+ไฟ | สลิป: กรอ. 693 + ภาษี 1,284',
       srows:[{l:'ประกัน Thai Life',b:1300,a:1300},{l:'Spotify',b:150,a:149},
-             {l:'YouTube',b:100,a:80},{l:'ค่าไฟ EasyBills',b:600,a:503}],
+             {l:'YouTube',b:100,a:80},{l:'ค่าไฟ EasyBills',b:600,a:503},
+             {l:'กรอ. Education Loan (สลิป)',b:693,a:693},
+             {l:'Withholding Tax (สลิป)',b:null,a:1284}],
       cats:[
         {i:'🛡️',n:'ประกัน Thai Life',b:1300,a:1300,f:'o',sub:null,
          t:[{d:'24/04',n:'THAI LIFE INS.',a:-640,s:'ktc'},{d:'07/05',n:'THAI LIFE INS.',a:-660,s:'ktc'}]},
-        {i:'📱',n:'Subscription',b:250,a:229,f:'o',sub:null,
+        {i:'📱',n:'Subscription (Spotify + YouTube)',b:250,a:229,f:'o',sub:null,
          t:[{d:'07/05',n:'Spotify',a:-149,s:'ktc'},{d:'10/05',n:'YouTube Member',a:-80,s:'ktc'}]},
         {i:'⚡',n:'ค่าไฟ (EasyBills)',b:600,a:503,f:'o',sub:null,
          t:[{d:'09/05',n:'EASYBILLS',a:-503,s:'ktc'}]},
+        {i:'📚',n:'กรอ. Education Loan',b:693,a:693,f:'o',sub:'หักจากสลิปเงินเดือน',
+         t:[{d:'สลิป',n:'EDUCATION LOAN (KRO)',a:-693,s:'ktb'}]},
+        {i:'📋',n:'Withholding Tax',b:null,a:1284,f:'o',sub:'ภาษีหัก ณ ที่จ่าย จากสลิป',
+         t:[{d:'สลิป',n:'WITHHOLDING TAX - EMPLOYEE',a:-1284,s:'ktb'}]},
       ]},
     saving:{label:'ออม / ลงทุน',isSaving:true,
-      note:'เหมียวจดหมวด ออมเงิน = กองทุนทอง + US Stock',
+      totalKTB:25552, totalPayslip:5916,
+      note:'KTB: ทอง DCA 2,000 + US 23,552 | สลิป: PVD+BIB+SSO (employee only)',
       cats:[
-        {i:'💾',n:'ออมเงิน / ลงทุน (เหมียวจด)',b:null,a:25552,f:'s',
-         sub:'กองทุนทอง SCBGOLDHR + US Stock / Dime',
-         t:[{d:'ต่างๆ',n:'ออม/ลงทุน KTB',a:-25552,s:'ktb'}]},
+        {i:'🥇',n:'กองทุนทอง SCBGOLDHR RMF',b:2000,a:2000,f:'s',src:'KTB',
+         sub:'DCA ทุกเดือน 2,000 บาท',
+         t:[{d:'พ.ค.',n:'ซื้อกองทุนทอง (DCA)',a:-2000,s:'ktb'}]},
+        {i:'📈',n:'US Stock / Dime',b:null,a:23552,f:'s',src:'KTB',
+         sub:'จาก KTB ออม/ลงทุน (25,552 - DCA ทอง 2,000)',
+         t:[{d:'พ.ค.',n:'ออม/ลงทุน Dime App',a:-23552,s:'ktb'}]},
+        {i:'💼',n:'PVD กองทุนสำรองเลี้ยงชีพ',b:null,a:2956,f:'s',src:'สลิป',
+         sub:'Employee 8% · บจ. สมทบอีก 2,956 (รวม 5,912/เดือน)',
+         t:[{d:'สลิป',n:'PROVIDENT FUND EMPLOYEE 8%',a:-2956,s:'ktb'}]},
+        {i:'🏭',n:'BIB Share (Michelin)',b:null,a:2085,f:'s',src:'สลิป',
+         sub:'ผ่อน Shareholding Plan · ไม่เพิ่มจำนวนหุ้น',
+         t:[{d:'สลิป',n:'BIB SHARE LOAN',a:-2085,s:'ktb'}]},
+        {i:'🏥',n:'SSO กองทุนประกันสังคม',b:null,a:875,f:'s',src:'สลิป',
+         sub:'Employee 875 · บจ. สมทบ 875 (รวม 1,750/เดือน)',
+         t:[{d:'สลิป',n:'SOCIAL SECURITY - EMPLOYEE',a:-875,s:'ktb'}]},
       ]},
     transfer:{label:'ย้ายเงิน',isTransfer:true,total:38500,
       cats:[
@@ -316,22 +392,40 @@ var MONTHS = {
   chart:{
     incomeRef:74025,
     incomeSources:[
-      {name:'Payslip NET',amt:38175,c:'#2D5A3D'},
+      {name:'Payslip NET (to KTB)',amt:38175,c:'#2D5A3D'},
       {name:'เงินก้อนพิเศษ',amt:31500,c:'#7B5EA7'},
       {name:'ค่าสอน/จ้าง',amt:4350,c:'#C4870A'},
     ],
     zones:[
-      {name:'ออม/ลงทุน',amt:25552,c:'#1B5FA8',
-       subs:[{n:'กองทุนทอง',a:12776,c:'#3A82D8'},{n:'US Stock/Dime',a:12776,c:'#5E9FDE'}]},
+      // ออม/ลงทุน: KTB (gold+US) + Payslip employee (PVD+BIB+SSO)
+      {name:'ออม/ลงทุน (KTB+สลิป)',amt:31468,c:'#1B5FA8',
+       subs:[{n:'ทอง DCA 2,000',a:2000,c:'#2D82B7'},{n:'US Stock/Dime',a:23552,c:'#5E9FDE'},
+             {n:'PVD (พนง.)',a:2956,c:'#1A4F7A'},{n:'BIB Share',a:2085,c:'#2C6DA4'},{n:'SSO (พนง.)',a:875,c:'#4A90C4'}]},
       {name:'รายจ่ายประจำวัน',amt:14721,c:'#C0392B',
        subs:[{n:'อาหาร&Grab',a:6953,c:'#C0392B'},{n:'ช้อปปิ้ง',a:5407,c:'#8E1B12'},{n:'เดินทาง',a:903,c:'#E87B6E'},{n:'บันเทิง+วิ่ง',a:1458,c:'#F0A89D'}]},
-      {name:'รายจ่ายคงที่',amt:6893,c:'#B7750D',
-       subs:[{n:'PVD 8%',a:2956,c:'#8A5508'},{n:'BIB Share',a:2085,c:'#B7750D'},{n:'SS+Tax+กรอ.',a:1852,c:'#E8C06B'}]},
-      {name:'ย้ายเงิน',amt:26859,c:'#5B3FA8',
-       subs:[{n:'เงินสำรองฉุกเฉิน',a:22000,c:'#5B3FA8'},{n:'เตรียมลงทุน',a:4859,c:'#8B6FCE'}]},
+      // รายจ่ายคงที่: KTC + Tax + กรอ. (PVD/BIB/SSO ย้ายไป ออม/ลงทุน)
+      {name:'รายจ่ายคงที่ (KTC+สลิป)',amt:4009,c:'#B7750D',
+       subs:[{n:'ประกัน+Sub+ไฟ',a:2032,c:'#B7750D'},{n:'Withholding Tax',a:1284,c:'#8A5508'},{n:'กรอ.',a:693,c:'#D4961F'}]},
+      {name:'ย้ายเงินสำรองฉุกเฉิน',amt:22000,c:'#5B3FA8',
+       subs:[{n:'เงินสำรองฉุกเฉิน',a:22000,c:'#5B3FA8'}]},
     ],
   },
   insight:'รายรับ KTB <strong>35,850 บาท</strong> · ออม <span class="hi g">25,552 (71.3%)</span> ดีมากครับ<br><br>Shopee KTC <span class="hi r">5,151 บาท</span> ผิดปกติ ถ้าปกติจะออมเพิ่มได้ ~3,000<br><br>Net Worth รวม SSO แล้ว <span class="hi g">~669,241 บาท</span>',
+
+  // ── การเคลื่อนเงินเดือนนี้ (ใช้แสดง +/- ในแต่ละ asset card) ──────
+  // delta > 0 = เงินเข้า/เพิ่มสินทรัพย์, delta < 0 = ลดสินทรัพย์/ชำระหนี้
+  monthlyFlow: {
+    emergency: { delta: 22000,  label: 'ย้ายเงิน 2 ครั้ง (เหมียวจด)' },
+    daily:     { recv: 74025,   spent: 28906, xfer: 38500 },
+    gold:      { delta: 2000,   label: 'DCA 2,000/เดือน (ตามแผน)' },
+    us:        { delta: 23552,  label: 'จาก KTB ออม/ลงทุน (25,552 - ทอง 2,000)' },
+    pvd:       { delta: 5912,   label: 'พนง. 2,956 + บจ. 2,956 (สลิป)' },
+    michelin:  { delta: 0,      label: 'ผ่อน 2,085/เดือน ไม่เพิ่มจำนวนหุ้น' },
+    sso:       { delta: 1750,   label: 'พนง. 875 + บจ. 875 (สลิป)' },
+    loan:      { delta: -693,   label: 'ชำระจากสลิปเงินเดือน' },
+    kfsmart:   { delta: 0, label: 'เริ่ม มิ.ย. 2026 (20% of investable)' },
+    useq:      { delta: 0, label: 'เริ่ม มิ.ย. 2026 (10% of investable)' },
+  },
 },
 
 '2026-06': null,
@@ -433,13 +527,13 @@ function renderHeader(m, key) {
     + '<div class="hdr-sub">อัปเดต ' + m.lastUpdated + '</div>'
     + '</div><span class="hdr-bdg">' + m.badge + '</span></div>'
     + '<div class="hero">'
-    + '<div class="hc"><div class="hc-l">Net Payment</div><div class="hc-a g">' + fmt(h.netPayment) + '</div><div class="hc-s">' + h.netPaymentSub + '</div></div>'
-    + '<div class="hc"><div class="hc-l">รายจ่าย KTB</div><div class="hc-a r">' + fmt(h.ktbExp) + '</div><div class="hc-s">' + h.ktbExpSub + '</div></div>'
-    + '<div class="hc"><div class="hc-l">KTC charges</div><div class="hc-a r">' + fmt(h.ktcCharges) + '</div><div class="hc-s">ครบ ' + h.ktcDue + '</div></div>'
-    + '<div class="hc"><div class="hc-l">ย้ายเงิน</div><div class="hc-a p">' + fmt(h.transfers) + '</div><div class="hc-s">' + h.transfersSub + '</div></div>'
+    + '<div class="hc"><div class="hc-l">Salary Earning (Payslip)</div><div class="hc-a g">' + fmt(h.salaryEarning) + '</div><div class="hc-s">' + h.earningsSub + '</div></div>'
+    + '<div class="hc"><div class="hc-l">รายจ่าย KTB (เหมียวจด)</div><div class="hc-a r">' + fmt(h.ktbExp) + '</div><div class="hc-s">' + h.ktbExpSub + '</div></div>'
+    + '<div class="hc"><div class="hc-l">KTC charges เดือนนี้</div><div class="hc-a r">' + fmt(h.ktcCharges) + '</div><div class="hc-s">ครบ ' + h.ktcDue + '</div></div>'
+    + '<div class="hc"><div class="hc-l">Salary Deduction (สลิป)</div><div class="hc-a" style="color:#fbbf24">' + fmt(h.salaryDeduction) + '</div><div class="hc-s">' + h.deductionSub + '</div></div>'
     + '</div>'
     + '<div class="sv-bar"><div class="sv-r">' + h.savingRate + '%</div><div class="sv-inf">'
-    + '<div class="sv-l">อัตราออม (' + h.savingDetail + ')</div>'
+    + '<div class="sv-l">อัตราออม KTB (' + h.savingDetail + ')</div>'
     + '<div class="sv-s">' + h.savingNote + '</div></div></div>'
     + '<div class="prog"><div class="prog-f" style="width:' + h.savingRate + '%"></div></div>';
 }
@@ -458,6 +552,39 @@ function renderAssets(m, key) {
   var nw = calcNetWorth(m);
   var usThb = nw.usThb;
   var michelinThb = nw.michelinThb;
+  var mf = m.monthlyFlow || {};
+
+  // New fund helper: build card for KFSMART / USEQ
+  function fundCard(key, icon) {
+    var f = a[key];
+    if (!f) return '';
+    var gain = f.cost > 0 ? f.amt - f.cost : 0;
+    var gainPct = f.cost > 0 ? (gain / f.cost * 100).toFixed(2) : 0;
+    var gainStr = f.cost > 0 ? (gain >= 0 ? '+ ' : '- ') + fmt(Math.abs(gain)) + ' (' + (gain >= 0 ? '+' : '') + gainPct + '%)' : '';
+    var riskCls = parseFloat(f.risk) <= 2 ? 'risk-low' : 'risk-high';
+    var flowH = mf[key] ? flowChip(mf[key].delta, mf[key].label) : '';
+
+    if (!f.started || f.amt === 0) {
+      return '<div class="asset-card fund-new">'
+        + '<div class="asset-lbl">' + icon + ' ' + key.toUpperCase() + ' · Dime App</div>'
+        + '<div style="font-size:10px;color:rgba(255,255,255,.4);margin:4px 0 2px">' + f.fullName + '</div>'
+        + '<div class="asset-amt" style="color:rgba(255,255,255,.3);font-size:13px">เริ่ม มิ.ย. 2026</div>'
+        + '<div class="fund-alloc">' + f.allocPct + '% of investable</div>'
+        + '<div class="goal-tag">เป้าหมาย: ' + f.purpose + '</div>'
+        + '<div class="risk-tag ' + riskCls + '">ความเสี่ยง ' + f.risk + '</div>'
+        + '</div>';
+    }
+    return '<div class="asset-card">'
+      + '<div class="asset-lbl">' + icon + ' ' + key.toUpperCase() + ' · Dime App</div>'
+      + '<div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:3px">' + f.fullName + '</div>'
+      + '<div class="asset-amt">' + fmt(f.amt) + ' บาท</div>'
+      + (gainStr ? '<div class="asset-sub ' + (gain >= 0 ? 'g' : '') + '">' + gainStr + '</div>' : '')
+      + flowH
+      + '<div class="fund-alloc">' + f.allocPct + '% investable · NAV ' + (f.nav || '-') + ' · ' + (f.units || 0) + ' หน่วย</div>'
+      + '<div class="goal-tag">เป้าหมาย: ' + f.purpose + '</div>'
+      + '<div class="risk-tag ' + riskCls + '">ความเสี่ยง ' + f.risk + '</div>'
+      + '</div>';
+  }  // monthly flow data
 
   var prevKey = currentIdx > 0 ? MONTHS_ORDER[currentIdx - 1] : null;
   var prevM   = prevKey ? MONTHS[prevKey] : null;
@@ -470,33 +597,67 @@ function renderAssets(m, key) {
       + '</div>';
   }
 
+  // Daily account flow: show cash flow summary inline
+  var dailyFlow = '';
+  if (mf.daily) {
+    dailyFlow = '<div class="flow-row" style="margin-top:4px">'
+      + '<span class="flow-lbl">รับ ' + fmt(mf.daily.recv) + ' · จ่าย ' + fmt(mf.daily.spent) + ' · ย้าย ' + fmt(mf.daily.xfer) + '</span>'
+      + '</div>';
+  }
+
+  // Michelin: special case — paying installment but no new shares
+  var michelinFlow = mf.michelin !== undefined
+    ? '<div class="flow-row"><span class="flow-chip flow-neu">ผ่อน 2,085/เดือน</span><span class="flow-lbl">ไม่เพิ่มจำนวนหุ้น</span></div>'
+    : '';
+
   var html = '<div class="asset-hdr-row">'
     + '<div class="asset-title">ทรัพย์สิน (Net Worth Tracker)</div>'
     + '<div class="asset-updated">อัปเดต ' + m.lastUpdated + '</div>'
     + '</div><div class="asset-grid">'
-    + assetCard('🏦', 'เงินสำรองฉุกเฉิน', fmt(a.emergency.amt) + ' บาท', a.emergency.note, 'high')
-    + assetCard('💳', 'บัญชีประจำวัน', fmt(a.daily.amt) + ' บาท', a.daily.note, 'high')
-    + assetCard('🥇', 'ทอง SCBGOLDHR RMF', fmt(a.gold.amt) + ' บาท', 'ต้นทุน ' + fmt(a.gold.cost) + ' กำไร +' + fmt(a.gold.amt - a.gold.cost), 'medium')
+    + assetCard('🏦', 'เงินสำรองฉุกเฉิน', fmt(a.emergency.amt) + ' บาท', a.emergency.note, 'high',
+        mf.emergency ? flowChip(mf.emergency.delta, mf.emergency.label) : '')
+    + assetCard('💳', 'บัญชีประจำวัน', fmt(a.daily.amt) + ' บาท', a.daily.note, 'high', dailyFlow)
+    + assetCard('🥇', 'ทอง SCBGOLDHR RMF', fmt(a.gold.amt) + ' บาท',
+        'ต้นทุน ' + fmt(a.gold.cost) + ' · กำไร +' + fmt(a.gold.amt - a.gold.cost), 'medium',
+        mf.gold ? flowChip(mf.gold.delta, mf.gold.label) : '')
     + '<div class="asset-card">'
     + '<div class="asset-lbl">📈 US Stock (Dime)</div>'
     + '<div class="asset-amt">$' + fmt(a.us.usd) + '</div>'
     + '<div class="asset-thb">≈ ' + fmt(usThb) + ' บาท</div>'
+    + (mf.us ? flowChip(mf.us.delta, mf.us.label) : '')
     + '<div class="asset-rate">$1 = ' + r.usdThb + ' บาท · +' + a.us.pct + '%</div>'
     + '<div class="liq-tag ' + LIQ.medium.cls + '">' + LIQ.medium.label + '</div></div>'
-    + assetCard('💼', 'PVD สยามมิชลิน', fmt(a.pvd.amt) + ' บาท', a.pvd.note + ' YTD +' + a.pvd.ytd + '%', 'low')
+    + assetCard('💼', 'PVD สยามมิชลิน', fmt(a.pvd.amt) + ' บาท',
+        a.pvd.note + ' YTD +' + a.pvd.ytd + '%', 'low',
+        mf.pvd ? flowChip(mf.pvd.delta, mf.pvd.label) : '')
     + '<div class="asset-card">'
     + '<div class="asset-lbl">🏭 Michelin BIB Sharinbox</div>'
     + '<div class="asset-amt">€' + a.michelin.eur.toLocaleString() + '</div>'
     + '<div class="asset-thb">≈ ' + fmt(michelinThb) + ' บาท</div>'
+    + michelinFlow
     + '<div class="asset-rate">€1 = ' + r.eurThb + ' บาท · ' + a.michelin.shares + ' หุ้น (' + a.michelin.date + ')</div>'
     + '<div class="liq-tag ' + LIQ.locked.cls + '">' + LIQ.locked.label + '</div></div>'
-    + assetCard('🏥', 'SSO ชราภาพ', fmt(a.sso.amt) + ' บาท', a.sso.note, 'low')
+    + assetCard('🏥', 'SSO ชราภาพ', fmt(a.sso.amt) + ' บาท', a.sso.note, 'low',
+        mf.sso ? flowChip(mf.sso.delta, mf.sso.label) : '')
+    + fundCard('kfsmart', '📊')
+    + fundCard('useq', '🏠')
+    + '</div>'
+    // Monthly Allocation Formula
+    + '<div class="alloc-box">'
+    + '<div class="alloc-title">📐 สูตรการจัดสรรเงินลงทุนรายเดือน</div>'
+    + '<div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:6px">หัก Gold DCA 2,000 → เหลือ Investable → แบ่งตามสัดส่วน</div>'
+    + '<div class="alloc-row"><span class="alloc-pct" style="color:#3A82D8">50%</span><div class="alloc-bar-wrap"><div class="alloc-bar" style="background:#3A82D8;width:50%"></div></div><span>📈 US Stocks (Dime FCD)</span></div>'
+    + '<div class="alloc-row"><span class="alloc-pct" style="color:#5B3FA8">20%</span><div class="alloc-bar-wrap"><div class="alloc-bar" style="background:#5B3FA8;width:20%"></div></div><span>🏦 Emergency Fund (KTB)</span></div>'
+    + '<div class="alloc-row"><span class="alloc-pct" style="color:#7de0a4">20%</span><div class="alloc-bar-wrap"><div class="alloc-bar" style="background:#7de0a4;width:20%"></div></div><span>📊 KFSMART-A (ท่องเที่ยว/รถ)</span></div>'
+    + '<div class="alloc-row"><span class="alloc-pct" style="color:#fbbf24">10%</span><div class="alloc-bar-wrap"><div class="alloc-bar" style="background:#fbbf24;width:10%"></div></div><span>🏠 PRINCIPAL USEQ-A (บ้าน)</span></div>'
+    + '<div style="font-size:9px;color:rgba(255,255,255,.2);margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,.07)">* Fixed: Gold RMF 2,000/เดือน (ก่อนคำนวณ %) · เริ่มสูตรใหม่ มิ.ย. 2026</div>'
     + '</div>'
     + '<div class="debt-card">'
     + '<div style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px">หนี้สิน</div>'
     + '<div class="asset-card" style="background:rgba(255,80,60,.06)">'
     + '<div class="asset-lbl">📚 เงินกู้ กรอ. (กยศ.)</div>'
     + '<div class="asset-amt" style="color:#ff8a7a">' + fmt(d.loan.total) + ' บาท</div>'
+    + (mf.loan ? flowChip(mf.loan.delta, mf.loan.label) : '')
     + '<div class="asset-sub" style="color:rgba(255,100,80,.5)">เงินต้น ' + fmt(d.loan.principal) + ' + ดอก ' + fmt(d.loan.interest) + '</div>'
     + '</div></div>'
     + '<div class="nw-box">'
@@ -509,7 +670,7 @@ function renderAssets(m, key) {
     + '<div class="nw-cell" style="text-align:right"><div class="nw-cell-lbl">Net Worth</div>'
     + '<div class="nw-total">~' + fmt(nw.netWorth) + ' บาท</div>' + deltaEl + '</div>'
     + '</div>'
-    + '<div class="nw-breakdown">เงินสด ' + fmt(a.emergency.amt + a.daily.amt) + ' · ทอง ' + fmt(a.gold.amt) + ' · US ~' + fmt(usThb) + ' · PVD ' + fmt(a.pvd.amt) + ' · Michelin ~' + fmt(michelinThb) + ' · SSO ' + fmt(a.sso.amt) + '</div>'
+    + '<div class="nw-breakdown">เงินสด ' + fmt(a.emergency.amt + a.daily.amt) + ' · ทอง ' + fmt(a.gold.amt) + ' · US ~' + fmt(usThb) + ' · PVD ' + fmt(a.pvd.amt) + ' · Michelin ~' + fmt(michelinThb) + ' · SSO ' + fmt(a.sso.amt) + (nw.kfsmartAmt > 0 ? ' · KFSMART ' + fmt(nw.kfsmartAmt) : '') + (nw.useqAmt > 0 ? ' · USEQ ' + fmt(nw.useqAmt) : '') + '</div>'
     + '</div>';
   panel.innerHTML = html;
 }
@@ -650,8 +811,12 @@ function renderExpenses() {
     bEl.innerHTML = '<div style="background:var(--pl);border:1px solid rgba(91,63,168,.2);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--purple);line-height:1.6">'
       + 'รายการย้ายเงิน ไม่นับเป็นรายจ่าย รวม <strong>' + fmt(d.total) + ' บาท</strong></div>';
   } else if (d.isSaving) {
-    bEl.innerHTML = '<div style="background:var(--bl);border:1px solid rgba(27,95,168,.2);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--blue);line-height:1.7">'
-      + 'ออม/ลงทุน <strong>' + fmt(d.cats[0].a) + ' บาท (' + m.hdr.savingRate + '% ของรายรับ KTB)</strong><br>' + d.note + '</div>';
+    var totalAll = (d.totalKTB || 0) + (d.totalPayslip || 0);
+    bEl.innerHTML = '<div style="background:var(--bl);border:1px solid rgba(27,95,168,.2);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--blue);line-height:1.8">'
+      + '<strong>รวมลงทุนเดือนนี้ ' + fmt(totalAll) + ' บาท</strong><br>'
+      + 'KTB (เหมียวจด): ทอง 2,000 + US ' + fmt((d.totalKTB || 0) - 2000) + ' = <strong>' + fmt(d.totalKTB || 0) + '</strong><br>'
+      + 'สลิป (Employee): PVD 2,956 + BIB 2,085 + SSO 875 = <strong>' + fmt(d.totalPayslip || 0) + '</strong>'
+      + '</div>';
   } else {
     var rows = [];
     for (var ri = 0; ri < d.srows.length; ri++) {
@@ -676,10 +841,16 @@ function renderExpenses() {
   for (var ci = 0; ci < d.cats.length; ci++) {
     var cat = d.cats[ci];
     var isSv = !!d.isSaving, isTr = !!d.isTransfer;
-    var pct = isSv ? m.hdr.savingRate : isTr ? (cat.a / (d.total || 1) * 100) : (cat.b ? Math.min(cat.a / cat.b * 100, 100) : 0);
+    var totalInv = isSv ? ((d.totalKTB || 0) + (d.totalPayslip || 0)) : 0;
+    var pct = isSv ? (totalInv > 0 ? Math.round(cat.a / totalInv * 100) : 0)
+            : isTr ? (cat.a / (d.total || 1) * 100)
+            : (cat.b ? Math.min(cat.a / cat.b * 100, 100) : 0);
     var isOver = !isSv && !isTr && cat.a > (cat.b || 0);
     var amtCls = isTr ? 't' : (isSv ? 's' : (isOver ? 'e' : 'o'));
-    var biTxt = isTr ? (cat.note || '') : isSv ? (m.hdr.savingRate + '% ของรายรับ KTB') : (isOver ? 'เกินงบ +' + fmt(cat.a - (cat.b || 0)) : 'เหลือ ' + fmt((cat.b || 0) - cat.a));
+    var srcLabel = isSv ? (cat.src === 'KTB' ? 'KTB · ' : 'สลิป · ') : '';
+    var biTxt = isTr ? (cat.note || '')
+              : isSv ? (srcLabel + (totalInv > 0 ? Math.round(cat.a / totalInv * 100) + '% ของลงทุนรวม' : '-'))
+              : (isOver ? 'เกินงบ +' + fmt(cat.a - (cat.b || 0)) : 'เหลือ ' + fmt((cat.b || 0) - cat.a));
     var biCls = isTr ? 'tr' : (isSv ? 'sv' : (isOver ? 'ov' : 'ok'));
 
     var txH = '';
